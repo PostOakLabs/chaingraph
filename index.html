@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The ChainGraph Standard v0.1 — Verifiable, Chainable, Agent-Callable Decision Artifacts</title>
+<meta name="description" content="An open, vendor-neutral specification for verifiable decision artifacts: a hash-anchored envelope, a reproducible execution hash, a provenance DAG, and MCP/A2A transport bindings. CC BY 4.0.">
+<meta name="author" content="Post Oak Labs">
+<meta name="robots" content="index, follow">
+<meta property="og:type" content="website">
+<meta property="og:title" content="The ChainGraph Standard v0.1">
+<meta property="og:description" content="Open spec for verifiable, chainable, agent-callable decision artifacts. Hash-anchored envelope + provenance DAG + MCP/A2A bindings. CC BY 4.0.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#080E1A;--bg-2:#0D1627;--bg-3:#111E35;--bg-4:#162340;
+  --border:#1E2F4A;--border-2:#263855;--muted:#3A5270;--body:#6888A8;
+  --text:#A8C4DE;--bright:#D4E8F8;--white:#EEF6FD;
+  --teal:#14B8A6;--teal-dim:rgba(20,184,166,.12);--teal-lt:#2DD4BF;
+  --gold:#D4A847;--gold-dim:rgba(212,168,71,.12);
+  --green:#22C55E;--green-dim:rgba(34,197,94,.12);
+  --purple:#9B72F5;--purple-dim:rgba(155,114,245,.12);
+  --red:#EF4444;--warn:#F59E0B;
+  --radius:6px;--radius-lg:10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-weight:300;font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(20,184,166,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(20,184,166,.018) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+h1,h2,h3,h4{font-family:'DM Serif Display',serif;font-weight:400;line-height:1.22}
+a{color:var(--teal-lt);text-decoration:none;border-bottom:1px solid rgba(45,212,191,.25)}
+a:hover{opacity:.8}
+a.plain{border:none}
+code,pre{font-family:'JetBrains Mono',monospace}
+code{font-size:.88em;color:var(--teal-lt);background:var(--teal-dim);padding:.05rem .32rem;border-radius:3px}
+.wrap{max-width:920px;margin:0 auto;padding:0 1.75rem;position:relative;z-index:1}
+
+/* nav */
+nav{position:sticky;top:0;z-index:50;background:rgba(8,14,26,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--border)}
+.nav-in{max-width:920px;margin:0 auto;padding:0 1.75rem;height:54px;display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.brand{font-family:'JetBrains Mono',monospace;font-size:.9rem;font-weight:600;color:var(--bright);border:none}
+.brand .cg{color:var(--teal)}
+.nav-links{display:flex;gap:1.1rem;flex-wrap:wrap}
+.nav-links a{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);border:none}
+.nav-links a:hover{color:var(--teal-lt)}
+
+/* hero */
+.hero{padding:3.5rem 0 2.5rem;border-bottom:1px solid var(--border)}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.22em;text-transform:uppercase;color:var(--teal);margin-bottom:1rem;display:flex;align-items:center;gap:.7rem}
+.eyebrow::before{content:'';width:26px;height:1px;background:var(--teal)}
+h1{font-size:clamp(2rem,4vw,3rem);color:var(--white);margin-bottom:1rem}
+.lede{font-size:1rem;color:var(--body);max-width:720px;line-height:1.95;margin-bottom:1.5rem}
+.badges{display:flex;gap:.6rem;flex-wrap:wrap;margin-bottom:1.5rem}
+.badge{font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.12em;text-transform:uppercase;padding:.35rem .7rem;border:1px solid}
+.b-teal{color:var(--teal);border-color:rgba(20,184,166,.3)}
+.b-gold{color:var(--gold);border-color:rgba(212,168,71,.3)}
+.b-purple{color:var(--purple);border-color:rgba(155,114,245,.3)}
+.b-muted{color:var(--muted);border-color:var(--border)}
+.cta{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.5rem}
+.btn{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;padding:.6rem 1.1rem;border-radius:var(--radius);border:1px solid var(--teal)}
+.btn-p{background:var(--teal);color:var(--bg);border-color:var(--teal)}
+.btn-g{background:transparent;color:var(--teal-lt)}
+
+/* sections */
+section{padding:2.5rem 0;border-bottom:1px solid var(--border)}
+.sec-num{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin-bottom:.5rem}
+h2{font-size:clamp(1.3rem,2.4vw,1.85rem);color:var(--white);margin-bottom:1rem}
+h3{font-size:1.12rem;color:var(--bright);margin:1.6rem 0 .6rem}
+p{color:var(--body);margin-bottom:1rem;max-width:760px}
+strong{color:var(--text);font-weight:500}
+ul,ol{margin:0 0 1rem 1.3rem;max-width:760px}
+li{color:var(--body);margin-bottom:.45rem}
+blockquote{border-left:3px solid var(--gold);background:var(--bg-2);padding:1rem 1.3rem;border-radius:0 var(--radius) var(--radius) 0;margin:1.2rem 0;max-width:760px}
+blockquote p{margin:0;color:var(--body)}
+pre{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.3rem;overflow-x:auto;font-size:.8rem;line-height:1.7;color:var(--text);margin:1rem 0;max-width:100%}
+pre .k{color:var(--teal-lt)}
+pre .s{color:var(--green)}
+pre .c{color:var(--muted)}
+
+/* level table */
+table{width:100%;border-collapse:collapse;margin:1.2rem 0;background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;font-size:.82rem}
+th{font-family:'JetBrains Mono',monospace;font-size:.54rem;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);text-align:left;padding:.7rem .9rem;background:var(--bg-3);border-bottom:1px solid var(--border-2)}
+td{color:var(--body);padding:.65rem .9rem;border-bottom:1px solid var(--border);vertical-align:top}
+tr:last-child td{border-bottom:none}
+td .lvl{font-family:'JetBrains Mono',monospace;color:var(--teal-lt);font-weight:500}
+
+.callout{background:var(--bg-2);border:1px solid var(--border-2);border-left:3px solid var(--teal);border-radius:0 var(--radius) var(--radius) 0;padding:1rem 1.3rem;margin:1.2rem 0;max-width:760px}
+.callout .lab{font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);margin-bottom:.4rem}
+.callout p{margin:0;font-size:.88rem}
+
+footer{padding:2.5rem 0 3rem}
+.foot{font-size:.78rem;color:var(--muted)}
+.foot a{color:var(--body)}
+.toc{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.4rem .9rem;margin:1rem 0;max-width:760px}
+.toc a{font-size:.82rem;border:none;color:var(--body)}
+.toc a:hover{color:var(--teal-lt)}
+@media(max-width:680px){.nav-links{display:none}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <a href="#top" class="brand"><span class="cg">Chain</span>Graph<span style="color:var(--muted)"> Standard</span></a>
+    <div class="nav-links">
+      <a href="#levels">Conformance</a>
+      <a href="#envelope">Envelope</a>
+      <a href="#hash">Hash</a>
+      <a href="#bindings">Bindings</a>
+      <a href="#adopt">Adopt</a>
+      <a href="https://github.com/PostOakLabs/chaingraph">GitHub ↗</a>
+    </div>
+  </div>
+</nav>
+
+<div id="top" class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Open Specification · v0.1.0 Draft · CC BY 4.0</div>
+    <h1>The ChainGraph Standard</h1>
+    <p class="lede">A small, transport-neutral envelope for the output of a <strong>decision tool</strong> — a tool that returns a verdict, score, or verified mandate rather than reference data. Each artifact carries a <strong>reproducible execution hash</strong>, may cite the hashes of the artifacts it consumed (a verifiable provenance DAG), and is exposed to AI agents over standard protocols (MCP, A2A). One common receipt format, so decision tools from different vendors can be chained, audited, and independently verified by any agent.</p>
+    <div class="badges">
+      <span class="badge b-teal">Hash-anchored</span>
+      <span class="badge b-gold">Chainable provenance DAG</span>
+      <span class="badge b-purple">MCP + A2A bindings</span>
+      <span class="badge b-muted">Vendor-neutral · Extensible</span>
+    </div>
+    <div class="cta">
+      <a class="btn btn-p plain" href="https://github.com/PostOakLabs/chaingraph">Repository ↗</a>
+      <a class="btn btn-g plain" href="schema/chaingraph-v0.1.json">Artifact schema (JSON)</a>
+      <a class="btn btn-g plain" href="ext/x-chaingraph/v0.1.json">A2A extension descriptor</a>
+    </div>
+  </div>
+</div>
+
+<section>
+  <div class="wrap">
+    <div class="sec-num">Contents</div>
+    <div class="toc">
+      <a href="#scope">1 · Scope &amp; goals</a>
+      <a href="#terms">2 · Terminology</a>
+      <a href="#levels">3 · Conformance levels</a>
+      <a href="#five">4 · The Five Tests</a>
+      <a href="#envelope">5 · Artifact envelope</a>
+      <a href="#hash">6 · Execution hash</a>
+      <a href="#prov">7 · Provenance model</a>
+      <a href="#bindings">8 · Transport bindings</a>
+      <a href="#privacy">9 · Privacy &amp; security</a>
+      <a href="#gov">10 · Versioning &amp; governance</a>
+      <a href="#adopt">11 · Adoption guide</a>
+      <a href="#related">12 · Related standards</a>
+    </div>
+  </div>
+</section>
+
+<section id="scope">
+  <div class="wrap">
+    <div class="sec-num">1 · Scope and goals</div>
+    <h2>What ChainGraph standardizes</h2>
+    <ol>
+      <li><strong>An artifact envelope</strong> (§5) — the JSON shape every conformant decision tool emits.</li>
+      <li><strong>A reproducible execution hash</strong> (§6) — a canonicalization + hashing procedure any party can re-run to verify an artifact, in any language.</li>
+      <li><strong>A provenance model</strong> (§7) — how one artifact cites another, forming a re-verifiable directed acyclic graph.</li>
+      <li><strong>Transport bindings</strong> (§8) — how a conformant tool is discovered and called by agents over MCP and A2A, and how a graph index is published for machine discovery.</li>
+    </ol>
+    <p><strong>Non-goals.</strong> ChainGraph does not define payment rails, mandate semantics, credential formats, or model behavior. It carries artifacts <em>about</em> those domains, and is deliberately compatible with AP2, ACP, x402, A2A, KYA-OS, and MCP without replacing any of them.</p>
+    <h3>Design principles</h3>
+    <ul>
+      <li><strong>Receipt, not protocol.</strong> The unit of value is a verifiable record of a computation, portable across vendors and transports.</li>
+      <li><strong>Verifiable by re-execution.</strong> Trust comes from reproducibility (recompute the hash), not from a signing authority.</li>
+      <li><strong>Decision, not context.</strong> Conformant tools emit a determination, not a data display.</li>
+      <li><strong>The graph is the product.</strong> Value compounds when artifacts chain; the envelope makes chaining cryptographically checkable.</li>
+      <li><strong>Privacy by locality.</strong> Compatible with — and encouraging — client-side, zero-egress execution, without mandating it.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="terms">
+  <div class="wrap">
+    <div class="sec-num">2 · Terminology</div>
+    <h2>Terms</h2>
+    <ul>
+      <li><strong>Decision tool</strong> — software that consumes inputs and returns a decision (verdict / score / classification / verified mandate).</li>
+      <li><strong>Artifact</strong> — one ChainGraph envelope instance, the output of one tool run.</li>
+      <li><strong>Execution hash</strong> — the SHA-256 over the canonical form of an artifact's inputs + outputs (§6).</li>
+      <li><strong>Chain</strong> — an ordered set of artifacts where each cites its predecessors' execution hashes.</li>
+      <li><strong>Provenance DAG</strong> — the directed acyclic graph formed by <code>chain.parent_hashes</code> edges across artifacts.</li>
+      <li><strong>Mandate type</strong> — an extensible classification of what the artifact decides (§7.3).</li>
+      <li><strong>Graph index</strong> — a published, machine-readable catalog of a vendor's tools and their chain edges (§8.3).</li>
+    </ul>
+    <p>The key words MUST, MUST NOT, SHOULD, SHOULD NOT, MAY are to be interpreted as in RFC 2119.</p>
+  </div>
+</section>
+
+<section id="levels">
+  <div class="wrap">
+    <div class="sec-num">3 · Conformance levels</div>
+    <h2>Four levels of conformance</h2>
+    <p>A tool, suite, or vendor MAY conform at increasing levels. Each level includes all lower levels.</p>
+    <table>
+      <thead><tr><th>Level</th><th>Name</th><th>Requirement</th></tr></thead>
+      <tbody>
+        <tr><td><span class="lvl">L1</span></td><td>Artifact-emitting</td><td>Emits a valid envelope (§5) with a reproducible execution hash (§6).</td></tr>
+        <tr><td><span class="lvl">L2</span></td><td>Provenance-anchored</td><td>Implements the <code>chain</code> block (§7); cites a consumed artifact's execution hash; its own hash is independently re-verifiable.</td></tr>
+        <tr><td><span class="lvl">L3</span></td><td>Agent-callable</td><td>Exposes the tool over a transport binding (§8) — an MCP <code>tools/call</code> endpoint and/or an A2A skill — returning the artifact as machine-parseable structured content.</td></tr>
+        <tr><td><span class="lvl">L4</span></td><td>Discoverable</td><td>Publishes a graph index (§8.3) enumerating tools, mandate types, and chain edges, linked from a discovery surface (<code>llms.txt</code>, agent card, or JSON-LD).</td></tr>
+      </tbody>
+    </table>
+    <p>A vendor claiming "ChainGraph L4" asserts all four levels. Conformant tools SHOULD also pass the <strong>Five Tests</strong> (§4), which operationalize the levels.</p>
+  </div>
+</section>
+
+<section id="five">
+  <div class="wrap">
+    <div class="sec-num">4 · The Five Tests</div>
+    <h2>Operational conformance check</h2>
+    <p>A decision tool is ChainGraph-conformant if and only if it passes all five:</p>
+    <ol>
+      <li><strong>Emits a valid artifact envelope</strong> — §5 JSON with <code>chaingraph_version</code>, <code>mandate_type</code>, <code>tool_id</code>, <code>execution_hash</code>, <code>chain</code> block, <code>policy_parameters</code>, <code>output_payload</code>, <code>compliance_flags</code>, <code>audit_signature</code>.</li>
+      <li><strong>Exposes an agent endpoint</strong> — a typed, declared input schema and deterministic output an agent can parse without vision (MCP and/or A2A; §8).</li>
+      <li><strong>Exports a decision, not context</strong> — a probability, a verdict, a verified mandate; not a data display or document dump.</li>
+      <li><strong>Is chainable</strong> — its output is a valid input or precondition for at least one other conformant tool.</li>
+      <li><strong>Carries a verifiable anchor</strong> — the execution hash is reproducible by an independent party via the §6 procedure.</li>
+    </ol>
+    <div class="callout"><div class="lab">Note</div><p>Heavy compute (GPU, Monte Carlo) is <em>not</em> part of conformance — the category is defined by the <strong>export</strong>, not the backend. Pure string/array transforms and 10⁶-path simulations are equally conformant if they pass the five tests.</p></div>
+  </div>
+</section>
+
+<section id="envelope">
+  <div class="wrap">
+    <div class="sec-num">5 · The artifact envelope</div>
+    <h2>Every tool run emits exactly one envelope</h2>
+<pre><span class="c">{</span>
+  <span class="k">"chaingraph_version"</span>: <span class="s">"0.1.0"</span>,
+  <span class="k">"ap2_version"</span>: <span class="s">"1.0.0"</span>,        <span class="c">// optional compat alias</span>
+  <span class="k">"mandate_type"</span>: <span class="s">"compliance_mandate"</span>,
+  <span class="k">"tool_id"</span>: <span class="s">"art-01-ap2-mandate-chain-validator"</span>,
+  <span class="k">"tool_version"</span>: <span class="s">"1.1.0"</span>,
+  <span class="k">"generated_at"</span>: <span class="s">"2026-06-14T14:30:00Z"</span>,
+  <span class="k">"execution_hash"</span>: <span class="s">"sha256:abc123…"</span>,
+  <span class="k">"chain"</span>: {
+    <span class="k">"parent_hashes"</span>: [],
+    <span class="k">"parent_tool_ids"</span>: [],
+    <span class="k">"chain_depth"</span>: 0
+  },
+  <span class="k">"policy_parameters"</span>: {              <span class="c">// part of the hash preimage</span>
+    <span class="k">"execution_backend"</span>: <span class="s">"webgpu | cpu-fallback | js | server"</span>,
+    <span class="k">"input_parameters"</span>: { <span class="c">…</span> }
+  },
+  <span class="k">"output_payload"</span>: { <span class="c">…the decision… (part of the hash preimage)</span> },
+  <span class="k">"compliance_flags"</span>: [],
+  <span class="k">"audit_signature"</span>: {                <span class="c">// self-asserted claims, not proofs</span>
+    <span class="k">"client_side_executed"</span>: true,
+    <span class="k">"zero_pii_verified"</span>: true,
+    <span class="k">"deterministic_run"</span>: true
+  },
+  <span class="k">"session_receipt_root"</span>: null      <span class="c">// optional, set by an aggregator (§7.4)</span>
+}</pre>
+    <p>Key rules: <code>execution_hash</code>, <code>policy_parameters</code>, and <code>output_payload</code> are REQUIRED; the <code>chain</code> block is REQUIRED at L2. New implementations SHOULD emit <code>chaingraph_version</code> and MAY keep <code>ap2_version</code> as a compatibility alias. Implementations MUST ignore unknown top-level fields (forward compatibility), and MUST NOT place values that vary between identical runs (timestamps, nonces, request IDs) inside <code>policy_parameters</code> or <code>output_payload</code>, or the hash will not reproduce. The <code>audit_signature</code> block holds <em>claims</em> — verification comes from re-execution (§6), not from this block.</p>
+    <p>The normative field-by-field rules and a JSON Schema are in the <a href="schema/chaingraph-v0.1.json">artifact schema</a> and the <a href="https://github.com/PostOakLabs/chaingraph">repository README</a>.</p>
+  </div>
+</section>
+
+<section id="hash">
+  <div class="wrap">
+    <div class="sec-num">6 · The execution hash</div>
+    <h2>Reproducible verification, no trusted signer</h2>
+    <p>The execution hash lets any party confirm an artifact by recomputation, with no shared secret. The preimage is a single JSON object with exactly two keys, in order:</p>
+<pre>preimage = { <span class="k">"policy_parameters"</span>: <span class="c">&lt;…&gt;</span>, <span class="k">"output_payload"</span>: <span class="c">&lt;…&gt;</span> }</pre>
+    <h3>Canonicalization (MUST be deterministic across implementations)</h3>
+    <ol>
+      <li>Recursively sort all object keys lexicographically (by Unicode code point).</li>
+      <li>Serialize to JSON with no insignificant whitespace (no spaces after <code>:</code> or <code>,</code>; no trailing newline).</li>
+      <li>Preserve array order exactly (arrays are ordered data; do not sort them).</li>
+      <li>Numbers: shortest round-trip form; quantize derived numeric outputs to a fixed precision before hashing (document the precision in <code>policy_parameters</code>) to avoid floating-point equality issues.</li>
+      <li>Strings: UTF-8, no escaping beyond the JSON minimum.</li>
+    </ol>
+    <p>Then: <code>execution_hash = "sha256:" + lowercase_hex( SHA-256( utf8( canonical_json ) ) )</code>.</p>
+    <h3>Reference implementation (browser, no library)</h3>
+<pre><span class="k">async function</span> executionHash(policy_parameters, output_payload) {
+  <span class="k">const</span> canon = (v) =&gt; Array.isArray(v) ? v.map(canon)
+    : (v &amp;&amp; <span class="k">typeof</span> v === <span class="s">'object'</span>)
+      ? Object.keys(v).sort().reduce((o,k)=&gt;(o[k]=canon(v[k]),o),{})
+      : v;
+  <span class="k">const</span> preimage = JSON.stringify(canon({ policy_parameters, output_payload }));
+  <span class="k">const</span> buf = <span class="k">await</span> crypto.subtle.digest(<span class="s">'SHA-256'</span>, <span class="k">new</span> TextEncoder().encode(preimage));
+  <span class="k">return</span> <span class="s">'sha256:'</span> + [...<span class="k">new</span> Uint8Array(buf)].map(b=&gt;b.toString(16).padStart(2,<span class="s">'0'</span>)).join(<span class="s">''</span>);
+}</pre>
+    <div class="callout"><div class="lab">Determinism requirement</div><p>A conformant tool MUST be deterministic: identical <code>policy_parameters</code> MUST yield identical <code>output_payload</code> (and identical hash). Stochastic tools (Monte Carlo) MUST seed their RNG from <code>policy_parameters</code> so runs reproduce. A non-reproducing hash is a failed verification, not a warning.</p></div>
+  </div>
+</section>
+
+<section id="prov">
+  <div class="wrap">
+    <div class="sec-num">7 · Provenance model</div>
+    <h2>The chain block</h2>
+<pre><span class="k">"chain"</span>: {
+  <span class="k">"parent_hashes"</span>: [<span class="s">"sha256:…"</span>],
+  <span class="k">"parent_tool_ids"</span>: [<span class="s">"art-01-ap2-mandate-chain-validator"</span>],
+  <span class="k">"chain_depth"</span>: 1
+}</pre>
+    <p>A tool that consumes another artifact MUST copy each consumed artifact's <code>execution_hash</code> into <code>parent_hashes</code> and the matching <code>tool_id</code> into <code>parent_tool_ids</code> (same order). Roots use empty arrays and <code>chain_depth: 0</code>; otherwise <code>chain_depth = max(parent depths) + 1</code>. The graph MUST be acyclic — reject a chain that would cite an ancestor.</p>
+    <p><strong>Re-verifiability.</strong> Because each parent is named by its execution hash, an auditor can re-run any parent with the recorded inputs, recompute the hash, and confirm the child's citation. The whole DAG is independently checkable without trusting the vendor — the property that distinguishes a ChainGraph chain from a documentation claim that two tools "work together."</p>
+    <h3>7.3 · Mandate-type registry (extensible)</h3>
+    <p><strong>Core types</strong> (unprefixed, reserved by the Standard): <code>prompt_template</code>, <code>payment_mandate</code>, <code>payment_policy</code>, <code>settlement_mandate</code>, <code>compliance_mandate</code>, <code>risk_control</code>, <code>liquidity_mandate</code>, <code>capital_assessment</code>, <code>credit_assessment</code>, <code>model_governance</code>, <code>attestation_mandate</code>, <code>cryptographic_mandate</code>, <code>infrastructure_mandate</code>, <code>treasury_mandate</code>, <code>account_mandate</code>.</p>
+    <p><strong>Namespaced extension types.</strong> A vendor MUST namespace any non-core type as <code>&lt;reverse-dns-or-registry-id&gt;/&lt;type&gt;</code> — e.g. <code>co.ainumbers/payment_mandate</code>, <code>io.apexlogics/contract_assessment</code>, <code>ocs/constraint_solution</code>. Unprefixed types not in the core registry are invalid; consumers MUST treat an unrecognized namespaced type as opaque (carry it, do not reject the chain).</p>
+    <blockquote><p><strong>Note on AP2.</strong> AP2 (Agent Payments Protocol, FIDO-governed) defines Intent/Cart/Payment mandates. ChainGraph <code>mandate_type</code> is an <em>independent classification vocabulary</em>, not an AP2 field. A ChainGraph tool MAY validate real AP2 structures, but emitting a ChainGraph artifact does not assert AP2 conformance — keep the two distinct in user-facing copy.</p></blockquote>
+    <h3>7.4 · Session receipts (aggregation)</h3>
+    <p>An <strong>aggregator tool</strong> MAY consume N artifacts from a session and emit an artifact whose <code>output_payload</code> contains a SHA-256 Merkle root over their execution hashes, plus per-artifact inclusion proofs, setting <code>session_receipt_root</code>. This yields a single tamper-evident receipt for an entire agent session — the audit object suited to record-keeping regimes (e.g. EU AI Act Art. 12, DORA). The aggregator is itself a conformant tool.</p>
+  </div>
+</section>
+
+<section id="bindings">
+  <div class="wrap">
+    <div class="sec-num">8 · Transport bindings</div>
+    <h2>Agent-callable and discoverable</h2>
+    <h3>8.1 · MCP binding (L3)</h3>
+    <p>A conformant tool exposed over the Model Context Protocol registers a <code>tools/call</code> endpoint with a typed input schema, declares <code>readOnlyHint: true</code> when it mutates nothing, and returns the <strong>artifact envelope</strong> as <code>structuredContent</code>. It SHOULD additionally provide three graph-level tools:</p>
+    <ul>
+      <li><code>emit_&lt;vendor&gt;_artifact</code> — given <code>tool_id</code> + <code>policy_parameters</code>, return the signed artifact.</li>
+      <li><code>verify_execution_hash</code> — given an artifact, recompute and compare (§6).</li>
+      <li><code>build_chaingraph</code> — given a chain name or goal, return the ordered node list with explicit <code>parent_hashes</code> wiring from the graph index.</li>
+    </ul>
+    <p>It MAY use MCP <strong>async Tasks</strong> for long-running computations and <strong>Sampling-with-Tools</strong> to run a chain as a server-side agent loop (MCP 2025-11-25 / 2026-07-28). Compute that must remain local MUST NOT be moved server-side merely to satisfy a binding — return a Task handle or deep-link instead.</p>
+    <h3>8.2 · A2A binding (L3/L4)</h3>
+    <p>A conformant vendor MAY publish an A2A agent card (<code>/.well-known/agent-card.json</code>, Agent2Agent v1.0) listing its decision-tool families as skills, pointing to its MCP endpoint and graph index, and declaring the <strong>ChainGraph capability extension</strong> <code>x-chaingraph</code>:</p>
+<pre><span class="k">"capabilities"</span>: {
+  <span class="k">"extensions"</span>: [{
+    <span class="k">"uri"</span>: <span class="s">"https://postoaklabs.github.io/chaingraph/ext/x-chaingraph/v0.1"</span>,
+    <span class="k">"description"</span>: <span class="s">"Emits ChainGraph verifiable decision artifacts (hash-anchored, chainable)."</span>,
+    <span class="k">"params"</span>: {
+      <span class="k">"conformance_level"</span>: <span class="s">"L4"</span>,
+      <span class="k">"graph_index"</span>: <span class="s">"https://ainumbers.co/chaingraph/chaingraph.json"</span>,
+      <span class="k">"verify_endpoint"</span>: <span class="s">"verify_execution_hash"</span>,
+      <span class="k">"hash_alg"</span>: <span class="s">"sha256"</span>,
+      <span class="k">"mandate_namespace"</span>: <span class="s">"co.ainumbers"</span>
+    }
+  }]
+}</pre>
+    <p>The <code>x-chaingraph</code> extension lets one agent discover, over A2A, that another agent's outputs are verifiable ChainGraph artifacts — and lets artifacts chain <strong>across vendors</strong>, each link verified through the producing vendor's <code>verify_execution_hash</code>.</p>
+    <h3>8.3 · Graph index (L4)</h3>
+    <p>A published JSON document enumerating the vendor's tools and chain edges. Minimum per-node fields: <code>tool_id</code>, <code>display_name</code>, <code>mcp_name</code>, <code>mandate_type</code>, <code>input_schema_ref</code>, <code>consumes</code>, <code>feeds</code>, <code>status</code>. Document-level: <code>chaingraph_version</code>, <code>mandate_namespace</code>, <code>verify_endpoint</code>, <code>five_tests</code>, <code>chain_block_spec</code>. It MUST be linked from at least one discovery surface. The AINumbers <code>chaingraph.json</code> is the reference shape.</p>
+  </div>
+</section>
+
+<section id="privacy">
+  <div class="wrap">
+    <div class="sec-num">9 · Privacy &amp; security</div>
+    <h2>Considerations</h2>
+    <ul>
+      <li><strong>Locality.</strong> Compatible with fully client-side, zero-egress execution and RECOMMENDS it for sensitive inputs. <code>audit_signature</code> flags are self-asserted; consumers needing assurance SHOULD re-execute (§6) in a trusted environment.</li>
+      <li><strong>No PII in the preimage.</strong> Because <code>policy_parameters</code> and <code>output_payload</code> are hashed and may be shared as a receipt, implementers MUST keep real personal data out of them.</li>
+      <li><strong>The hash is integrity, not authenticity.</strong> A match proves inputs→outputs reproduce; it does NOT prove <em>who</em> ran the tool. Add a real signature (e.g. JWS over the envelope) as a separate layer if authenticity is required.</li>
+      <li><strong>Determinism is a security property.</strong> Non-deterministic tools cannot be verified.</li>
+      <li><strong>Chain integrity.</strong> Verify parent hashes before trusting a chain's claims; a cited parent that does not reproduce invalidates the chain from that node down.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="gov">
+  <div class="wrap">
+    <div class="sec-num">10 · Versioning &amp; governance</div>
+    <h2>How the Standard evolves</h2>
+    <ul>
+      <li>Semver. 0.x is draft; field renames may occur before 1.0 (notably <code>ap2_version</code> → <code>chaingraph_version</code> consolidation).</li>
+      <li>The core mandate-type registry is additive after 1.0: new core types may be added; existing ones are never removed or repurposed. Vendor namespaces evolve independently.</li>
+      <li>Reference implementation: the AINumbers ChainGraph suite tracks the latest draft; divergences are documented in its graph index <code>chaingraph_version</code>.</li>
+      <li>Published under CC BY 4.0 so other projects — including Post Oak Labs' ApexLogics and OCS suites and third parties — can adopt and extend it. Register your <code>mandate_namespace</code> with the editor (open an issue) to avoid collisions.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="adopt">
+  <div class="wrap">
+    <div class="sec-num">11 · Adoption guide</div>
+    <h2>Make an existing decision-tool suite conformant</h2>
+    <ol>
+      <li><strong>L1 — wrap your outputs in the envelope (§5)</strong> and compute the execution hash (§6). For most tools this is a serialization change, not a logic change. Pick your <code>mandate_namespace</code> (e.g. <code>io.apexlogics</code>, <code>ocs</code>).</li>
+      <li><strong>L2 — add the <code>chain</code> block.</strong> Wherever a tool already consumes another tool's output, copy the parent's execution hash into <code>parent_hashes</code>. You now have a verifiable DAG.</li>
+      <li><strong>L3 — expose <code>tools/call</code> + <code>verify_execution_hash</code>.</strong> If you already run an MCP server (ApexLogics and OCS both expose <code>build_workflow_links</code>-style tools), add <code>emit_&lt;vendor&gt;_artifact</code>, <code>verify_execution_hash</code>, and <code>build_chaingraph</code>. Return the envelope as <code>structuredContent</code>.</li>
+      <li><strong>L4 — publish a graph index (§8.3) and an A2A agent card</strong> declaring <code>x-chaingraph</code>. Link both from your <code>llms.txt</code>.</li>
+    </ol>
+    <div class="callout"><div class="lab">The payoff</div><p>Once two suites are L4 with <code>x-chaingraph</code>, an orchestrating agent can chain artifacts <strong>across</strong> them — an OCS constraint solution can cite an ApexLogics assessment as a parent, an AINumbers compliance verdict can cite either — and verify every link through each vendor's published <code>verify_execution_hash</code>. That cross-suite provenance graph is the reason to publish the standard rather than keep it internal.</p></div>
+  </div>
+</section>
+
+<section id="related">
+  <div class="wrap">
+    <div class="sec-num">12 · Related standards</div>
+    <h2>A complement, not a competitor</h2>
+    <ul>
+      <li><strong>AP2 / ACP / x402 / Visa TAP</strong> (agent payments) — ChainGraph artifacts carry the <em>verdict</em> of validating these; <code>payment_mandate</code>/<code>settlement_mandate</code> tools wrap them.</li>
+      <li><strong>A2A</strong> (agent-to-agent) — ChainGraph rides A2A for discovery and cross-agent hand-off via <code>x-chaingraph</code>.</li>
+      <li><strong>MCP</strong> (agent-to-tool) — ChainGraph's primary call/verify transport.</li>
+      <li><strong>KYA-OS / eIDAS 2.0 / EUDI</strong> — subjects a ChainGraph compliance tool may decide over.</li>
+      <li><strong>W3C Verifiable Credentials</strong> — adjacent: VCs assert <em>attributes</em> with issuer signatures; ChainGraph asserts <em>reproducible computations</em> verified by re-execution. A vendor MAY emit both.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p class="foot">The ChainGraph Standard v0.1.0 (DRAFT) · Editor: <a href="https://postoaklabs.com">Post Oak Labs</a> · 2026-06-14 · Licensed <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> — reuse with attribution.<br>
+    Reference implementation: <a href="https://ainumbers.co/chaingraph/chaingraph-hub.html">AINumbers ChainGraph Suite</a> · Repository: <a href="https://github.com/PostOakLabs/chaingraph">github.com/PostOakLabs/chaingraph</a> · <a href="schema/chaingraph-v0.1.json">Artifact schema</a> · <a href="ext/x-chaingraph/v0.1.json">A2A extension</a></p>
+  </div>
+</footer>
+
+</body>
+</html>

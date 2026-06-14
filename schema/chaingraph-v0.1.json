@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://postoaklabs.github.io/chaingraph/schema/chaingraph-v0.1.json",
+  "title": "ChainGraph Artifact Envelope",
+  "description": "The JSON envelope every ChainGraph-conformant decision tool emits. See The ChainGraph Standard v0.1 §5-§7. CC BY 4.0, Post Oak Labs.",
+  "type": "object",
+  "required": [
+    "mandate_type",
+    "tool_id",
+    "tool_version",
+    "generated_at",
+    "execution_hash",
+    "policy_parameters",
+    "output_payload",
+    "compliance_flags",
+    "audit_signature"
+  ],
+  "properties": {
+    "chaingraph_version": {
+      "type": "string",
+      "description": "The Standard version this artifact targets (e.g. '0.1.0'). REQUIRED at L1 for new implementations.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "ap2_version": {
+      "type": "string",
+      "description": "Optional compatibility alias for implementations migrating from the AINumbers internal schema. New implementations SHOULD prefer chaingraph_version."
+    },
+    "mandate_type": {
+      "type": "string",
+      "description": "What the artifact decides. A core registry value (§7.3) or a namespaced extension value '<reverse-dns-or-registry-id>/<type>'.",
+      "anyOf": [
+        {
+          "enum": [
+            "prompt_template",
+            "payment_mandate",
+            "payment_policy",
+            "settlement_mandate",
+            "compliance_mandate",
+            "risk_control",
+            "liquidity_mandate",
+            "capital_assessment",
+            "credit_assessment",
+            "model_governance",
+            "attestation_mandate",
+            "cryptographic_mandate",
+            "infrastructure_mandate",
+            "treasury_mandate",
+            "account_mandate"
+          ]
+        },
+        {
+          "pattern": "^[A-Za-z0-9_.-]+/[A-Za-z0-9_]+$",
+          "description": "Namespaced extension type, e.g. co.ainumbers/payment_mandate."
+        }
+      ]
+    },
+    "tool_id": {
+      "type": "string",
+      "description": "Stable kebab-case identifier, unique within the vendor namespace.",
+      "minLength": 1
+    },
+    "tool_version": {
+      "type": "string",
+      "description": "Semver of the emitting tool.",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp. NOT part of the hash preimage."
+    },
+    "execution_hash": {
+      "type": "string",
+      "description": "'sha256:' + lowercase hex digest of SHA-256 over the canonical JSON of {policy_parameters, output_payload}. See §6.",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "chain": {
+      "type": "object",
+      "description": "Provenance block. REQUIRED at L2. Forms a re-verifiable acyclic DAG.",
+      "required": ["parent_hashes", "parent_tool_ids", "chain_depth"],
+      "properties": {
+        "parent_hashes": {
+          "type": "array",
+          "description": "execution_hash strings of upstream artifacts consumed in this run.",
+          "items": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" }
+        },
+        "parent_tool_ids": {
+          "type": "array",
+          "description": "tool_id strings matching each parent hash, same order.",
+          "items": { "type": "string" }
+        },
+        "chain_depth": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "0 for root; max(parent depths) + 1 otherwise."
+        }
+      }
+    },
+    "policy_parameters": {
+      "type": "object",
+      "description": "The inputs that determined the decision, plus execution_backend. Part of the hash preimage. MUST NOT contain per-run varying values (timestamps, nonces) or real PII.",
+      "properties": {
+        "execution_backend": {
+          "type": "string",
+          "enum": ["webgpu", "cpu-fallback", "js", "server"]
+        }
+      }
+    },
+    "output_payload": {
+      "type": "object",
+      "description": "The decision (verdict / score / verified mandate). Part of the hash preimage."
+    },
+    "compliance_flags": {
+      "type": "array",
+      "description": "Machine-readable flags raised by the run. MAY be empty.",
+      "items": {}
+    },
+    "audit_signature": {
+      "type": "object",
+      "description": "Self-asserted execution properties. These are claims, not proofs — verification comes from re-execution (§6).",
+      "properties": {
+        "client_side_executed": { "type": "boolean" },
+        "zero_pii_verified": { "type": "boolean" },
+        "deterministic_run": { "type": "boolean" }
+      }
+    },
+    "session_receipt_root": {
+      "type": ["string", "null"],
+      "description": "A SHA-256 Merkle root over a session's artifact hashes, set by an aggregator tool (§7.4). null when not aggregated."
+    }
+  },
+  "additionalProperties": true
+}
