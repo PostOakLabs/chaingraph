@@ -117,7 +117,7 @@ footer{padding:2.5rem 0 3rem}
 
 <div id="top" class="hero">
   <div class="wrap">
-    <div class="eyebrow">Open Specification · v0.4.0 · CC BY 4.0</div>
+    <div class="eyebrow">Open Specification · v0.4 · CC BY 4.0</div>
     <h1>The ChainGraph Standard</h1>
     <p class="lede">A small, transport-neutral envelope for the output of a <strong>decision tool</strong> — a tool that returns a verdict, score, or verified mandate rather than reference data. Each artifact carries a <strong>reproducible execution hash</strong>, may cite the hashes of the artifacts it consumed (a verifiable provenance DAG), and is exposed to AI agents over standard protocols (MCP, A2A). One common receipt format, so decision tools from different vendors can be chained, audited, and independently verified by any agent.</p>
     <div class="badges">
@@ -396,14 +396,14 @@ footer{padding:2.5rem 0 3rem}
       <li><strong>A2A</strong> (agent-to-agent) — ChainGraph rides A2A for discovery and cross-agent hand-off via <code>x-chaingraph</code>.</li>
       <li><strong>MCP</strong> (agent-to-tool) — ChainGraph's primary call/verify transport.</li>
       <li><strong>KYA-OS / eIDAS 2.0 / EUDI</strong> — subjects a ChainGraph compliance tool may decide over.</li>
-      <li><strong>W3C Verifiable Credentials</strong> — adjacent: VCs assert <em>attributes</em> with issuer signatures; ChainGraph asserts <em>reproducible computations</em> verified by re-execution. A vendor MAY emit both.</li>
+      <li><strong>W3C Verifiable Credentials</strong> — adjacent: VCs assert <em>attributes</em> with issuer signatures; ChainGraph asserts <em>reproducible computations</em> verified by re-execution. As of <strong>v0.4.1</strong>, ChainGraph can render any verified artifact as a W3C VC 2.0 credential via the <code>chaingraph_export:vc</code> profile (§13.11) — a view that re-states the canonical <code>execution_hash</code> and mints no new hash or proof.</li>
     </ul>
   </div>
 </section>
 
 <footer>
   <div class="wrap">
-    <p class="foot">The ChainGraph Standard v0.4.0 · Editor: <a href="https://postoaklabs.com">Post Oak Labs</a> · 2026-06-21 · Licensed <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> — reuse with attribution.<br>
+    <p class="foot">The ChainGraph Standard v0.4 · Editor: <a href="https://postoaklabs.com">Post Oak Labs</a> · 2026-06-22 · Licensed <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> — reuse with attribution.<br>
     Reference implementation: <a href="https://ainumbers.co/chaingraph/chaingraph-hub.html">AINumbers ChainGraph Suite</a> · Repository: <a href="https://github.com/PostOakLabs/chaingraph">github.com/PostOakLabs/chaingraph</a> · <a href="schema/openchain-graph-v0.4.schema.json">Artifact schema</a> · <a href="ext/x-chaingraph/v0.1.json">A2A extension</a></p>
   </div>
 </footer>
