@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The ChainGraph Standard v0.1 — Verifiable, Chainable, Agent-Callable Decision Artifacts</title>
+<title>The ChainGraph Standard v0.4 — Verifiable, Chainable, Agent-Callable Decision Artifacts</title>
 <meta name="description" content="An open, vendor-neutral specification for verifiable decision artifacts: a hash-anchored envelope, a reproducible execution hash, a provenance DAG, and MCP/A2A transport bindings. CC BY 4.0.">
 <meta name="author" content="Post Oak Labs">
 <meta name="robots" content="index, follow">
 <meta property="og:type" content="website">
-<meta property="og:title" content="The ChainGraph Standard v0.1">
+<meta property="og:title" content="The ChainGraph Standard v0.4">
 <meta property="og:description" content="Open spec for verifiable, chainable, agent-callable decision artifacts. Hash-anchored envelope + provenance DAG + MCP/A2A bindings. CC BY 4.0.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -117,7 +117,7 @@ footer{padding:2.5rem 0 3rem}
 
 <div id="top" class="hero">
   <div class="wrap">
-    <div class="eyebrow">Open Specification · v0.1.0 Draft · CC BY 4.0</div>
+    <div class="eyebrow">Open Specification · v0.4.0 · CC BY 4.0</div>
     <h1>The ChainGraph Standard</h1>
     <p class="lede">A small, transport-neutral envelope for the output of a <strong>decision tool</strong> — a tool that returns a verdict, score, or verified mandate rather than reference data. Each artifact carries a <strong>reproducible execution hash</strong>, may cite the hashes of the artifacts it consumed (a verifiable provenance DAG), and is exposed to AI agents over standard protocols (MCP, A2A). One common receipt format, so decision tools from different vendors can be chained, audited, and independently verified by any agent.</p>
     <div class="badges">
@@ -128,7 +128,9 @@ footer{padding:2.5rem 0 3rem}
     </div>
     <div class="cta">
       <a class="btn btn-p plain" href="https://github.com/PostOakLabs/chaingraph">Repository ↗</a>
-      <a class="btn btn-g plain" href="schema/chaingraph-v0.1.json">Artifact schema (JSON)</a>
+      <a class="btn btn-g plain" href="spec.html">Full specification (v0.4)</a>
+      <a class="btn btn-g plain" href="SPEC.md">Normative SPEC.md</a>
+      <a class="btn btn-g plain" href="schema/openchain-graph-v0.4.schema.json">Artifact schema (JSON)</a>
       <a class="btn btn-g plain" href="ext/x-chaingraph/v0.1.json">A2A extension descriptor</a>
     </div>
   </div>
@@ -258,7 +260,7 @@ footer{padding:2.5rem 0 3rem}
   <span class="k">"session_receipt_root"</span>: null      <span class="c">// optional, set by an aggregator (§7.4)</span>
 }</pre>
     <p>Key rules: <code>execution_hash</code>, <code>policy_parameters</code>, and <code>output_payload</code> are REQUIRED; the <code>chain</code> block is REQUIRED at L2. New implementations SHOULD emit <code>chaingraph_version</code> and MAY keep <code>ap2_version</code> as a compatibility alias. Implementations MUST ignore unknown top-level fields (forward compatibility), and MUST NOT place values that vary between identical runs (timestamps, nonces, request IDs) inside <code>policy_parameters</code> or <code>output_payload</code>, or the hash will not reproduce. The <code>audit_signature</code> block holds <em>claims</em> — verification comes from re-execution (§6), not from this block.</p>
-    <p>The normative field-by-field rules and a JSON Schema are in the <a href="schema/chaingraph-v0.1.json">artifact schema</a> and the <a href="https://github.com/PostOakLabs/chaingraph">repository README</a>.</p>
+    <p>The normative field-by-field rules and a JSON Schema are in the <a href="schema/openchain-graph-v0.4.schema.json">artifact schema</a> and the <a href="https://github.com/PostOakLabs/chaingraph">repository README</a>.</p>
   </div>
 </section>
 
@@ -304,7 +306,7 @@ footer{padding:2.5rem 0 3rem}
     <p><strong>Re-verifiability.</strong> Because each parent is named by its execution hash, an auditor can re-run any parent with the recorded inputs, recompute the hash, and confirm the child's citation. The whole DAG is independently checkable without trusting the vendor — the property that distinguishes a ChainGraph chain from a documentation claim that two tools "work together."</p>
     <h3>7.3 · Mandate-type registry (extensible)</h3>
     <p><strong>Core types</strong> (unprefixed, reserved by the Standard): <code>prompt_template</code>, <code>payment_mandate</code>, <code>payment_policy</code>, <code>settlement_mandate</code>, <code>compliance_mandate</code>, <code>risk_control</code>, <code>liquidity_mandate</code>, <code>capital_assessment</code>, <code>credit_assessment</code>, <code>model_governance</code>, <code>attestation_mandate</code>, <code>cryptographic_mandate</code>, <code>infrastructure_mandate</code>, <code>treasury_mandate</code>, <code>account_mandate</code>.</p>
-    <p><strong>Namespaced extension types.</strong> A vendor MUST namespace any non-core type as <code>&lt;reverse-dns-or-registry-id&gt;/&lt;type&gt;</code> — e.g. <code>co.ainumbers/payment_mandate</code>, <code>io.apexlogics/contract_assessment</code>, <code>ocs/constraint_solution</code>. Unprefixed types not in the core registry are invalid; consumers MUST treat an unrecognized namespaced type as opaque (carry it, do not reject the chain).</p>
+    <p><strong>Namespaced extension types.</strong> A vendor MUST namespace any non-core type as <code>&lt;reverse-dns-or-registry-id&gt;/&lt;type&gt;</code> — e.g. <code>co.ainumbers/payment_mandate</code>, <code>org.apexlogics/credential_assessment</code>, <code>me.omegacentauri/imbh_constraint</code>. Unprefixed types not in the core registry are invalid; consumers MUST treat an unrecognized namespaced type as opaque (carry it, do not reject the chain).</p>
     <blockquote><p><strong>Note on AP2.</strong> AP2 (Agent Payments Protocol, FIDO-governed) defines Intent/Cart/Payment mandates. ChainGraph <code>mandate_type</code> is an <em>independent classification vocabulary</em>, not an AP2 field. A ChainGraph tool MAY validate real AP2 structures, but emitting a ChainGraph artifact does not assert AP2 conformance — keep the two distinct in user-facing copy.</p></blockquote>
     <h3>7.4 · Session receipts (aggregation)</h3>
     <p>An <strong>aggregator tool</strong> MAY consume N artifacts from a session and emit an artifact whose <code>output_payload</code> contains a SHA-256 Merkle root over their execution hashes, plus per-artifact inclusion proofs, setting <code>session_receipt_root</code>. This yields a single tamper-evident receipt for an entire agent session — the audit object suited to record-keeping regimes (e.g. EU AI Act Art. 12, DORA). The aggregator is itself a conformant tool.</p>
@@ -376,7 +378,7 @@ footer{padding:2.5rem 0 3rem}
     <div class="sec-num">11 · Adoption guide</div>
     <h2>Make an existing decision-tool suite conformant</h2>
     <ol>
-      <li><strong>L1 — wrap your outputs in the envelope (§5)</strong> and compute the execution hash (§6). For most tools this is a serialization change, not a logic change. Pick your <code>mandate_namespace</code> (e.g. <code>io.apexlogics</code>, <code>ocs</code>).</li>
+      <li><strong>L1 — wrap your outputs in the envelope (§5)</strong> and compute the execution hash (§6). For most tools this is a serialization change, not a logic change. Pick your <code>mandate_namespace</code> (e.g. <code>org.apexlogics</code>, <code>me.omegacentauri</code>).</li>
       <li><strong>L2 — add the <code>chain</code> block.</strong> Wherever a tool already consumes another tool's output, copy the parent's execution hash into <code>parent_hashes</code>. You now have a verifiable DAG.</li>
       <li><strong>L3 — expose <code>tools/call</code> + <code>verify_execution_hash</code>.</strong> If you already run an MCP server (ApexLogics and OCS both expose <code>build_workflow_links</code>-style tools), add <code>emit_&lt;vendor&gt;_artifact</code>, <code>verify_execution_hash</code>, and <code>build_chaingraph</code>. Return the envelope as <code>structuredContent</code>.</li>
       <li><strong>L4 — publish a graph index (§8.3) and an A2A agent card</strong> declaring <code>x-chaingraph</code>. Link both from your <code>llms.txt</code>.</li>
@@ -401,8 +403,8 @@ footer{padding:2.5rem 0 3rem}
 
 <footer>
   <div class="wrap">
-    <p class="foot">The ChainGraph Standard v0.1.0 (DRAFT) · Editor: <a href="https://postoaklabs.com">Post Oak Labs</a> · 2026-06-14 · Licensed <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> — reuse with attribution.<br>
-    Reference implementation: <a href="https://ainumbers.co/chaingraph/chaingraph-hub.html">AINumbers ChainGraph Suite</a> · Repository: <a href="https://github.com/PostOakLabs/chaingraph">github.com/PostOakLabs/chaingraph</a> · <a href="schema/chaingraph-v0.1.json">Artifact schema</a> · <a href="ext/x-chaingraph/v0.1.json">A2A extension</a></p>
+    <p class="foot">The ChainGraph Standard v0.4.0 · Editor: <a href="https://postoaklabs.com">Post Oak Labs</a> · 2026-06-21 · Licensed <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> — reuse with attribution.<br>
+    Reference implementation: <a href="https://ainumbers.co/chaingraph/chaingraph-hub.html">AINumbers ChainGraph Suite</a> · Repository: <a href="https://github.com/PostOakLabs/chaingraph">github.com/PostOakLabs/chaingraph</a> · <a href="schema/openchain-graph-v0.4.schema.json">Artifact schema</a> · <a href="ext/x-chaingraph/v0.1.json">A2A extension</a></p>
   </div>
 </footer>
 

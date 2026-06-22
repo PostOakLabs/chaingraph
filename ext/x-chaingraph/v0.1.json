@@ -40,7 +40,7 @@
         },
         "mandate_namespace": {
           "type": "string",
-          "description": "The vendor's reverse-DNS or registry-id namespace for non-core mandate types (§7.3), e.g. 'co.ainumbers', 'io.apexlogics', 'ocs'."
+          "description": "The vendor's reverse-DNS or registry-id namespace for non-core mandate types (§7.3), e.g. 'co.ainumbers', 'org.apexlogics', 'me.omegacentauri'."
         }
       }
     }

@@ -1,0 +1,65 @@
+{
+  "_comment": "ChainGraph Standard v0.1 — mandate-namespace registry (Standard §7.3 + §10). Each entry reserves a vendor namespace for non-core mandate types so they cannot collide across vendors. To register a namespace: add an entry below (reverse-DNS or registry-id, must be globally unique), then open a PR/issue on github.com/PostOakLabs/chaingraph. Core (unprefixed) mandate types are reserved by the Standard and are NOT registered here.",
+  "registry_version": "1.0.0",
+  "updated": "2026-06-14",
+  "namespaces": [
+    {
+      "namespace": "co.ainumbers",
+      "owner": "Post Oak Labs",
+      "contact": "tim@postoaklabs.com",
+      "suite": "AINumbers ChainGraph Suite",
+      "url": "https://ainumbers.co",
+      "graph_index": "https://ainumbers.co/chaingraph/chaingraph.json",
+      "agent_card": "https://ainumbers.co/.well-known/agent-card.json",
+      "mcp_server": "https://mcp.ainumbers.co/mcp",
+      "verify_endpoint": "verify_execution_hash",
+      "conformance_level": "L4",
+      "registered": "2026-06-14"
+    },
+    {
+      "namespace": "org.apexlogics",
+      "owner": "Post Oak Labs / Apex Advisors",
+      "contact": "tim@postoaklabs.com",
+      "suite": "ApexLogics Careertech Suite",
+      "url": "https://apexlogics.org",
+      "graph_index": "https://apexlogics.org/chaingraph.json",
+      "agent_card": "https://apexlogics.org/.well-known/agent-card.json",
+      "mcp_server": "https://mcp.apexlogics.org/mcp",
+      "verify_endpoint": "verify_execution_hash",
+      "conformance_level": "L4",
+      "mandate_types": [
+        "org.apexlogics/compensation_assessment",
+        "org.apexlogics/education_roi",
+        "org.apexlogics/career_mobility",
+        "org.apexlogics/credential_assessment",
+        "org.apexlogics/student_finance",
+        "org.apexlogics/workforce_analytics",
+        "org.apexlogics/immigration_assessment",
+        "org.apexlogics/tax_projection",
+        "org.apexlogics/research_estimate"
+      ],
+      "registered": "2026-06-14"
+    },
+    {
+      "namespace": "me.omegacentauri",
+      "owner": "The Omega Centauri Society",
+      "contact": "tim@postoaklabs.com",
+      "suite": "OCS Science Suite",
+      "url": "https://omegacentauri.me",
+      "graph_index": "https://omegacentauri.me/chaingraph.json",
+      "agent_card": "https://omegacentauri.me/.well-known/agent-card.json",
+      "mcp_server": "https://mcp.omegacentauri.me/mcp",
+      "verify_endpoint": "verify_execution_hash",
+      "conformance_level": "L3",
+      "mandate_types": [
+        "me.omegacentauri/imbh_constraint",
+        "me.omegacentauri/bh_physics",
+        "me.omegacentauri/fermi_estimate",
+        "me.omegacentauri/seti_sensitivity",
+        "me.omegacentauri/transcension_model",
+        "me.omegacentauri/kardashev_metric"
+      ],
+      "registered": "2026-06-14"
+    }
+  ]
+}

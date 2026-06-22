@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="ocg-spec-version" content="0.4.0">
+<title>OpenChainGraph Standard v0.4 — Technical Specification</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Sora:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#080E1A; --bg-2:#0D1627; --bg-3:#111E35; --bg-4:#162340;
+  --border:#1E2F4A; --border-2:#263855;
+  --muted:#3A5270; --body:#6888A8; --text:#A8C4DE; --bright:#D4E8F8; --white:#EEF6FD;
+  --teal:#14B8A6; --teal-dim:rgba(20,184,166,.10); --teal-lt:#2DD4BF;
+  --gold:#D4A847; --gold-dim:rgba(212,168,71,.10);
+  --green:#22C55E; --green-dim:rgba(34,197,94,.10);
+  --purple:#9B72F5; --purple-dim:rgba(155,114,245,.10);
+  --red:#EF4444;
+  --radius:6px; --radius-lg:10px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Sora',sans-serif;font-size:14.5px;line-height:1.75;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(20,184,166,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(20,184,166,.018) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+h1,h2,h3,h4{font-family:'DM Serif Display',serif;font-weight:400;line-height:1.2}
+code,pre{font-family:'JetBrains Mono',monospace}
+code{font-size:.82em;color:var(--teal-lt);background:var(--teal-dim);padding:.05rem .3rem;border-radius:3px}
+a{color:var(--teal-lt);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:960px;margin:0 auto;padding:0 2rem;position:relative;z-index:1}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:200;background:rgba(8,14,26,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);height:52px;display:flex;align-items:center;padding:0 2rem}
+.nav-in{max-width:960px;margin:0 auto;width:100%;display:flex;align-items:center;justify-content:space-between}
+.brand{font-family:'JetBrains Mono',monospace;font-size:.88rem;font-weight:500;color:var(--bright)}
+.brand .oc{color:var(--teal)}
+.nav-meta{display:flex;align-items:center;gap:10px}
+.nav-tag{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.nav-pill{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.1em;text-transform:uppercase;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(212,168,71,.3);padding:.2rem .6rem;border-radius:20px}
+.nav-link{font-size:.72rem;color:var(--body);text-decoration:none;transition:color .15s}
+.nav-link:hover{color:var(--teal-lt)}
+
+/* HERO */
+.hero{padding:3.5rem 0 2.5rem;border-bottom:1px solid var(--border)}
+.eyebrow{font-family:'JetBrains Mono',monospace;font-size:.52rem;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin-bottom:.9rem;display:flex;align-items:center;gap:.7rem}
+.eyebrow::before{content:'';width:24px;height:1px;background:var(--teal)}
+.hero h1{font-size:clamp(1.8rem,3.5vw,2.8rem);color:var(--white);margin-bottom:.7rem}
+.hero-desc{font-size:.95rem;color:var(--body);max-width:660px;line-height:1.9}
+
+/* SECTION */
+.section{padding:2.5rem 0;border-bottom:1px solid var(--border)}
+.section:last-of-type{border-bottom:none}
+.sec-num{font-family:'JetBrains Mono',monospace;font-size:.48rem;letter-spacing:.2em;text-transform:uppercase;color:var(--teal);margin-bottom:.4rem}
+.section h2{font-size:clamp(1.2rem,2.2vw,1.65rem);color:var(--white);margin-bottom:.6rem}
+.section p{color:var(--body);font-size:.9rem;max-width:760px;margin-bottom:.9rem}
+.section h3{font-size:1rem;color:var(--bright);margin:1.4rem 0 .5rem;font-family:'JetBrains Mono',monospace;font-weight:500;font-size:.85rem;letter-spacing:.04em}
+.section h4{font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--teal-lt);font-weight:500;letter-spacing:.06em;margin:1rem 0 .35rem}
+
+/* CODE BLOCKS */
+.code-block{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin:1rem 0}
+.code-header{display:flex;align-items:center;justify-content:space-between;padding:.5rem 1rem;border-bottom:1px solid var(--border);background:var(--bg-3)}
+.code-lang{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.code-note{font-family:'JetBrains Mono',monospace;font-size:.5rem;color:var(--gold);letter-spacing:.06em}
+pre{padding:1.1rem 1.2rem;overflow-x:auto;line-height:1.65;font-size:.78rem;color:var(--text)}
+.k{color:var(--teal-lt)} /* key */
+.v{color:var(--gold)} /* string value */
+.n{color:var(--green)} /* number / uri */
+.c{color:var(--muted)} /* comment */
+.new{color:var(--green);font-weight:500} /* new in v0.2 */
+
+/* TABLE */
+.spec-table{width:100%;border-collapse:collapse;margin:1rem 0;font-size:.82rem}
+.spec-table th{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);text-align:left;padding:.5rem .8rem;border-bottom:1px solid var(--border-2)}
+.spec-table td{padding:.5rem .8rem;border-bottom:1px solid var(--border);color:var(--body);vertical-align:top}
+.spec-table td:first-child{font-family:'JetBrains Mono',monospace;color:var(--text);font-size:.76rem;white-space:nowrap}
+.spec-table td code{font-size:.75em}
+.spec-table tr:last-child td{border-bottom:none}
+.badge-new{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:.44rem;letter-spacing:.1em;text-transform:uppercase;background:var(--green-dim);color:var(--green);border:1px solid rgba(34,197,94,.25);padding:.1rem .45rem;border-radius:20px;vertical-align:middle;margin-left:.4rem}
+
+/* CALLOUT */
+.callout{background:var(--bg-3);border:1px solid var(--border-2);border-left:3px solid var(--teal);border-radius:0 var(--radius) var(--radius) 0;padding:.85rem 1.1rem;margin:1rem 0}
+.callout.gold{border-left-color:var(--gold)}
+.callout.purple{border-left-color:var(--purple)}
+.callout .lab{font-family:'JetBrains Mono',monospace;font-size:.46rem;letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:.3rem}
+.callout.gold .lab{color:var(--gold)}
+.callout.purple .lab{color:var(--purple)}
+.callout p{color:var(--body);font-size:.85rem;margin:0}
+
+/* CHANGELOG */
+.change-row{display:grid;grid-template-columns:120px 1fr;gap:.6rem 1.2rem;padding:.55rem 0;border-bottom:1px solid var(--border);font-size:.82rem}
+.change-row:last-child{border-bottom:none}
+.change-ref{font-family:'JetBrains Mono',monospace;color:var(--teal-lt);font-size:.72rem}
+.change-desc{color:var(--body)}
+
+/* TOC */
+.toc{background:var(--bg-2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.3rem;margin:1.8rem 0}
+.toc-title{font-family:'JetBrains Mono',monospace;font-size:.5rem;letter-spacing:.16em;text-transform:uppercase;color:var(--teal);margin-bottom:.7rem}
+.toc ol{padding-left:1.2rem;display:flex;flex-direction:column;gap:.3rem}
+.toc li{font-size:.82rem;color:var(--body)}
+.toc a{color:var(--text)}
+.toc a:hover{color:var(--teal-lt)}
+
+footer{padding:2rem 0 2.5rem;border-top:1px solid var(--border);margin-top:1rem}
+.foot{font-size:.72rem;color:var(--muted)}
+.foot a{color:var(--body)}
+.foot span{color:var(--border-2);margin:0 .4rem}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <span class="brand"><span class="oc">Open</span>ChainGraph Standard</span>
+    <div class="nav-meta">
+      <a class="nav-link" href="chaingraph-hub.html">← Hub</a>
+      <span class="nav-tag">Technical Specification</span>
+      <span class="nav-pill">v0.4.0</span>
+    </div>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Post Oak Labs · Open Specification · 2026</div>
+    <h1>OpenChainGraph Standard v0.4.0</h1>
+    <p class="hero-desc">Cryptographic provenance for AI-agent financial decisions. Where v0.2 aligned the <em>provenance envelope</em> with general-purpose standards (W3C PROV-DM, in-toto, Ed25519, OpenTelemetry, DCAT 3.0), v0.3 aligns the <em>financial payload</em> and the <em>knowledge layer</em>: an optional ISO 20022-aligned semantic profile, optional LEI / <code>did:key</code> party identity, and an Open Knowledge Format (OKF) companion bundle generated from the Graph Index. <strong>v0.3.1</strong> formalizes profile conformance: profiles are now published as dereferenceable URIs declared via <code>dct:conformsTo</code> (W3C PROF / Content Negotiation by Profile), with <code>semantic_profile</code> retained as a registered token alias, and a new <code>iso20022:party-identification</code> profile (REDA/ACMT-aligned) for party-only payloads. Every v0.3.1 addition is optional and additive — all v0.1/v0.2/v0.3 artifacts remain valid, the hash preimage is unchanged, and internal protocol identifiers are preserved. <strong>v0.4</strong> adds <strong>Compute Binding</strong> (§12) — server-side kernels make every <code>gpu:false</code> node agent-native over MCP in a single round-trip — and <strong>Export Profiles</strong> (§13) — the <code>chaingraph_export</code> umbrella (xlsx / pdf / csv / xbrl) renders a verified artifact for human, pipeline, and regulator consumption, generated downstream of and excluded from the hash preimage.</p>
+  </div>
+</div>
+
+<div class="section" style="padding-top:1.8rem;padding-bottom:1.8rem">
+  <div class="wrap">
+    <div class="toc">
+      <div class="toc-title">Contents</div>
+      <ol>
+        <li><a href="#s1">Artifact Schema (v0.4)</a></li>
+        <li><a href="#s2">Hash Preimage Construction (unchanged)</a></li>
+        <li><a href="#s3">JSON-LD @context — W3C PROV-DM Alignment</a></li>
+        <li><a href="#s4">Signature Envelope — in-toto Format</a></li>
+        <li><a href="#s5">Ed25519 Signing Algorithm</a></li>
+        <li><a href="#s6">OpenTelemetry Span Mapping</a></li>
+        <li><a href="#s7">DCAT 3.0 Graph Index</a></li>
+        <li><a href="#s8">ISO 20022 Semantic Profile <span style="color:var(--green)">(new in v0.3)</span></a></li>
+        <li><a href="#s9">Party Identity — LEI &amp; did:key <span style="color:var(--green)">(new in v0.3)</span></a></li>
+        <li><a href="#s10">OKF Companion Bundle <span style="color:var(--green)">(new in v0.3)</span></a></li>
+        <li><a href="#s11">Profile Conformance <span style="color:var(--green)">(new in v0.3.1)</span></a></li>
+        <li><a href="#s12">Compute Binding <span style="color:var(--green)">(new in v0.4)</span></a></li>
+        <li><a href="#s13">Export Profiles <span style="color:var(--green)">(new in v0.4)</span></a></li>
+        <li><a href="#s14">Changelog</a></li>
+      </ol>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ §1 Artifact Schema ═══ -->
+<div class="section" id="s1">
+  <div class="wrap">
+    <div class="sec-num">Section 1</div>
+    <h2>Artifact Schema (v0.4)</h2>
+    <p>The complete artifact envelope at v0.4. Fields marked <span class="badge-new">new</span> are additions in v0.3 (§8–§9); the v0.2 envelope fields (<code>@context</code>, <code>buildType</code>, the in-toto <code>audit_signature</code>) are retained, and all v0.1 and v0.2 artifacts remain valid — implementations may omit any optional field.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">JSON — Full Artifact Envelope</span>
+        <span class="code-note">▲ new fields highlighted</span>
+      </div>
+      <pre>{
+  <span class="k">"@context"</span>: <span class="v">"https://ainumbers.co/chaingraph/context/v0.3/context.jsonld"</span>,  <span class="c">// JSON-LD context (§3); ISO 20022 tools use an array adding iso20022-context.jsonld (§8)</span>
+  <span class="k">"chaingraph_version"</span>: <span class="v">"0.4.0"</span>,
+  <span class="k">"compute_mode"</span>: <span class="v new">"server"</span>,  <span class="c">// NEW in v0.4 — "server" | "browser" (§12); excluded from hash preimage</span>
+  <span class="k">"buildType"</span>: <span class="n">"https://ainumbers.co/chaingraph/context/v0.2#WebCryptoSHA256"</span>,  <span class="c">// version-independent algorithm URI — unchanged in v0.4 (§4)</span>
+  <span class="k">"mandate_id"</span>: <span class="v">"uuid-v4-string"</span>,
+  <span class="k">"tool_id"</span>: <span class="v">"ain:art-01"</span>,
+  <span class="k">"mandate_type"</span>: <span class="v">"ap2_mandate_chain_record"</span>,
+  <span class="k">"semantic_profile"</span>: <span class="v new">"iso20022:pacs.008-subset"</span>,  <span class="c">// NEW in v0.3 — optional ISO 20022 alignment (§8)</span>
+  <span class="k">"execution_hash"</span>: <span class="v">"sha256:3f9a1b2c8d7e4f0a5c6b2e1d9f3a7c4b8f1e5d2a9c0b6f3e7d4a1b8c5e2f9d0"</span>,
+  <span class="k">"chain"</span>: {
+    <span class="k">"parent_hashes"</span>: [<span class="v">"sha256:abc123..."</span>],
+    <span class="k">"parent_tool_ids"</span>: [<span class="v">"ain:art-00"</span>],
+    <span class="k">"chain_depth"</span>: <span class="n">1</span>
+  },
+  <span class="k">"policy_parameters"</span>: { <span class="c">/* tool-specific inputs */</span> },
+  <span class="k">"output_payload"</span>:    { <span class="c">/* tool-specific outputs */</span> },
+  <span class="k">"compliance_flags"</span>: [],
+  <span class="k">"audit_signature"</span>: {                          <span class="c">// UPDATED — now in-toto envelope (§4)</span>
+    <span class="k">"payloadType"</span>: <span class="v new">"application/vnd.openchain.graph+json;version=0.2"</span>,
+    <span class="k">"payload"</span>:     <span class="v new">"&lt;base64url(canonical_json_of_artifact_without_this_field)&gt;"</span>,
+    <span class="k">"signatures"</span>: [
+      {
+        <span class="k">"keyid"</span>: <span class="v new">"sha256:&lt;fingerprint_of_ed25519_public_key&gt;"</span>,
+        <span class="k">"sig"</span>:   <span class="v new">"&lt;base64url(ed25519_signature_over_payload)&gt;"</span>
+      }
+    ]
+  }
+}</pre>
+    </div>
+
+    <div class="callout">
+      <div class="lab">Backwards compatibility</div>
+      <p>A v0.1 artifact (no <code>@context</code>, no <code>buildType</code>, <code>audit_signature</code> as a bare string or empty) is still valid. Verifiers MUST accept both. The <code>buildType</code> URI defaults to <code>https://ainumbers.co/chaingraph/context/v0.2#WebCryptoSHA256</code> if absent.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ §2 Hash Preimage ═══ -->
+<div class="section" id="s2">
+  <div class="wrap">
+    <div class="sec-num">Section 2</div>
+    <h2>Hash Preimage Construction <span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);font-style:normal">(unchanged from v0.1)</span></h2>
+    <p>The canonical preimage for <code>execution_hash</code> is deterministic and reproducible by any party. No timestamps, nonces, or process-specific state may enter the preimage.</p>
+
+    <h3>Algorithm</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Pseudocode</span></div>
+      <pre>preimage = {
+  "output_payload":    artifact.output_payload,
+  "policy_parameters": artifact.policy_parameters
+}
+
+<span class="c">// 1. Serialize with keys sorted lexicographically (deep sort — all nested objects)</span>
+canonical_json = JSON.stringify(preimage, sorted_replacer)
+
+<span class="c">// 2. Encode as UTF-8 bytes</span>
+bytes = TextEncoder().encode(canonical_json)
+
+<span class="c">// 3. SHA-256 via WebCrypto (or any compliant SHA-256 implementation)</span>
+hash_buffer = await crypto.subtle.digest("SHA-256", bytes)
+
+<span class="c">// 4. Hex-encode</span>
+execution_hash = "sha256:" + hex(hash_buffer)</pre>
+    </div>
+
+    <div class="callout gold">
+      <div class="lab">Key constraint</div>
+      <p>Only <code>policy_parameters</code> and <code>output_payload</code> enter the preimage. Fields like <code>mandate_id</code>, <code>tool_id</code>, <code>chaingraph_version</code>, and <code>chain</code> are excluded — they describe the artifact but are not part of the decision being fingerprinted. Any party can re-run this with the recorded inputs and confirm the hash.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ §3 JSON-LD ═══ -->
+<div class="section" id="s3">
+  <div class="wrap">
+    <div class="sec-num">Section 3 — New in v0.2</div>
+    <h2>JSON-LD @context — W3C PROV-DM Alignment</h2>
+    <p>Publishing a JSON-LD context makes OpenChainGraph artifacts interpretable by any system that speaks W3C PROV (regulatory tooling, DORA/Basel/EU AI Act compliance platforms, semantic web processors). The mapping is additive — existing tools need not change their output format.</p>
+
+    <h4>Published context URL: <code>https://ainumbers.co/chaingraph/context/v0.2/context.jsonld</code></h4>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">JSON-LD context</span><span class="code-note">Maps OpenChainGraph → W3C PROV-DM</span></div>
+      <pre>{
+  <span class="k">"@context"</span>: {
+    <span class="k">"@vocab"</span>:   <span class="n">"https://ainumbers.co/chaingraph/context/v0.2#"</span>,
+    <span class="k">"prov"</span>:     <span class="n">"http://www.w3.org/ns/prov#"</span>,
+    <span class="k">"dcat"</span>:     <span class="n">"http://www.w3.org/ns/dcat#"</span>,
+    <span class="k">"schema"</span>:   <span class="n">"https://schema.org/"</span>,
+
+    <span class="c">// Tool = prov:Agent that performed the computation</span>
+    <span class="k">"tool_id"</span>:          { <span class="k">"@id"</span>: <span class="v">"prov:wasAttributedTo"</span> },
+
+    <span class="c">// policy_parameters = prov:Entity (the input data consumed)</span>
+    <span class="k">"policy_parameters"</span>: { <span class="k">"@id"</span>: <span class="v">"prov:used"</span> },
+
+    <span class="c">// output_payload = prov:Entity generated by the activity</span>
+    <span class="k">"output_payload"</span>:    { <span class="k">"@id"</span>: <span class="v">"prov:wasGeneratedBy"</span> },
+
+    <span class="c">// chain.parent_hashes = set of prov:wasDerivedFrom relations</span>
+    <span class="k">"parent_hashes"</span>:     { <span class="k">"@id"</span>: <span class="v">"prov:wasDerivedFrom"</span>, <span class="k">"@container"</span>: <span class="v">"@list"</span> },
+
+    <span class="c">// execution_hash = prov:hadPrimarySource (the content-addressed identifier)</span>
+    <span class="k">"execution_hash"</span>:    { <span class="k">"@id"</span>: <span class="v">"prov:hadPrimarySource"</span> },
+
+    <span class="c">// mandate_type = schema:additionalType (semantic classification)</span>
+    <span class="k">"mandate_type"</span>:      { <span class="k">"@id"</span>: <span class="v">"schema:additionalType"</span> },
+
+    <span class="c">// chain_depth = schema:position (ordinal distance from root)</span>
+    <span class="k">"chain_depth"</span>:       { <span class="k">"@id"</span>: <span class="v">"schema:position"</span>, <span class="k">"@type"</span>: <span class="v">"xsd:integer"</span> }
+  }
+}</pre>
+    </div>
+
+    <h3>PROV-DM conceptual mapping</h3>
+    <table class="spec-table">
+      <thead><tr><th>OpenChainGraph Field</th><th>W3C PROV-DM Concept</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td>artifact (whole)</td><td><code>prov:Entity</code></td><td>The decision artifact is a provenance entity identified by its execution_hash</td></tr>
+        <tr><td><code>tool_id</code></td><td><code>prov:Agent</code></td><td>The software tool that performed the computation</td></tr>
+        <tr><td>tool computation</td><td><code>prov:Activity</code></td><td>The deterministic computation that produced the output_payload from policy_parameters</td></tr>
+        <tr><td><code>policy_parameters</code></td><td><code>prov:used</code> (Entity)</td><td>Input data consumed by the activity</td></tr>
+        <tr><td><code>output_payload</code></td><td><code>prov:wasGeneratedBy</code></td><td>Output entity produced by the activity</td></tr>
+        <tr><td><code>chain.parent_hashes[n]</code></td><td><code>prov:wasDerivedFrom</code></td><td>Each parent hash identifies a predecessor entity in the provenance graph</td></tr>
+        <tr><td><code>execution_hash</code></td><td><code>prov:hadPrimarySource</code></td><td>Content-addressed identifier — functions as the PROV entity IRI</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="lab">Why this matters for compliance</div>
+      <p>DORA ICT risk assessments, Basel RWA decision chains, and EU AI Act Art. 12/14 audit trails all increasingly reference W3C PROV vocabulary. An OpenChainGraph artifact with a <code>@context</code> is machine-readable by every existing PROV processor without modification.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ §4 in-toto Signature Envelope ═══ -->
+<div class="section" id="s4">
+  <div class="wrap">
+    <div class="sec-num">Section 4 — New in v0.2</div>
+    <h2>Signature Envelope — in-toto Format</h2>
+    <p>The <code>audit_signature</code> field is upgraded from an opaque string to a structured in-toto Attestation Framework envelope (ITE-6 compatible). This enables independent signature verification using any in-toto-compliant verifier, and future integration with Sigstore and Cosign.</p>
+
+    <p>The <code>buildType</code> URI identifies the specific hash construction algorithm used for the <code>execution_hash</code>. The currently defined values:</p>
+
+    <table class="spec-table">
+      <thead><tr><th>buildType URI</th><th>Algorithm</th></tr></thead>
+      <tbody>
+        <tr><td><code>https://ainumbers.co/chaingraph/context/v0.2#WebCryptoSHA256</code></td><td>WebCrypto <code>crypto.subtle.digest("SHA-256")</code> over sorted-key JSON — the default</td></tr>
+        <tr><td><code>https://ainumbers.co/chaingraph/context/v0.2#NodeCryptoSHA256</code></td><td>Node.js <code>crypto.createHash('sha256')</code> over the same canonical preimage — server-side variant</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Envelope construction</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Pseudocode — building the signature envelope</span></div>
+      <pre><span class="c">// 1. Build a copy of the artifact without the audit_signature field</span>
+artifact_for_signing = omit(artifact, "audit_signature")
+
+<span class="c">// 2. Serialize canonically (sorted keys, no extra whitespace)</span>
+canonical_json = JSON.stringify(artifact_for_signing, sorted_replacer)
+
+<span class="c">// 3. Base64url-encode the UTF-8 bytes — this is the "payload"</span>
+payload = base64url(TextEncoder().encode(canonical_json))
+
+<span class="c">// 4. Sign (see §5 for Ed25519 details)</span>
+sig = base64url(ed25519.sign(private_key, TextEncoder().encode(payload)))
+
+<span class="c">// 5. Embed the envelope</span>
+artifact.audit_signature = {
+  payloadType: "application/vnd.openchain.graph+json;version=0.2",
+  payload:     payload,
+  signatures:  [{ keyid: key_fingerprint, sig: sig }]
+}</pre>
+    </div>
+
+    <h3>Verification</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Pseudocode — verifying the envelope</span></div>
+      <pre><span class="c">// 1. Extract payload and signature from the artifact</span>
+{ payload, signatures } = artifact.audit_signature
+{ keyid, sig } = signatures[0]
+
+<span class="c">// 2. Look up the vendor's public key from the Graph Index (§7)</span>
+public_key = graph_index.tools
+  .find(t => t.tool_id === artifact.tool_id)
+  .signing_keys
+  .find(k => k.keyid === keyid)
+  .public_key
+
+<span class="c">// 3. Verify Ed25519 signature</span>
+is_valid = ed25519.verify(
+  public_key,
+  TextEncoder().encode(payload),  <span class="c">// message = the payload bytes</span>
+  base64url_decode(sig)
+)
+
+<span class="c">// 4. Separately, verify the execution_hash (as in v0.1)</span>
+artifact_body = base64url_decode(payload)
+recomputed_hash = sha256(canonical_preimage(artifact_body))
+hash_matches = ("sha256:" + recomputed_hash) === artifact.execution_hash</pre>
+    </div>
+
+    <div class="callout gold">
+      <div class="lab">Integrity vs. authenticity</div>
+      <p>The <code>execution_hash</code> provides <em>integrity</em> — it proves the artifact hasn't been modified since it was created. The Ed25519 signature provides <em>authenticity</em> — it proves the specific tool vendor produced this artifact. Both checks should be run. An artifact that passes hash verification but fails signature verification could be a replay of a legitimate artifact with a different <code>mandate_id</code>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ §5 Ed25519 ═══ -->
+<div class="section" id="s5">
+  <div class="wrap">
+    <div class="sec-num">Section 5 — New in v0.2</div>
+    <h2>Ed25519 Signing Algorithm</h2>
+    <p>OpenChainGraph specifies Ed25519 (RFC 8032) as the signing algorithm. Ed25519 is compact (32-byte keys, 64-byte signatures), fast, and the algorithm mandated by SLSA L2+ provenance attestations.</p>
+
+    <h3>Key lifecycle</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">WebCrypto — key generation</span></div>
+      <pre><span class="c">// Generate key pair (store private key in a secure enclave or HSM)</span>
+const { publicKey, privateKey } = await crypto.subtle.generateKey(
+  { name: "Ed25519" },
+  true,           <span class="c">// extractable (for export)</span>
+  ["sign", "verify"]
+)
+
+<span class="c">// Export public key as raw bytes → hex → publish in Graph Index</span>
+const raw = await crypto.subtle.exportKey("raw", publicKey)
+const pub_hex = Array.from(new Uint8Array(raw))
+  .map(b => b.toString(16).padStart(2, '0')).join('')
+
+<span class="c">// Key fingerprint = sha256(raw_public_key_bytes), hex-encoded</span>
+const fp_buf = await crypto.subtle.digest("SHA-256", raw)
+const keyid = "sha256:" + Array.from(new Uint8Array(fp_buf))
+  .map(b => b.toString(16).padStart(2, '0')).join('')</pre>
+    </div>
+
+    <h3>Signing</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">WebCrypto — signing</span></div>
+      <pre><span class="c">// payload = base64url string (from §4 step 3)</span>
+const message = TextEncoder().encode(payload)
+const sig_bytes = await crypto.subtle.sign("Ed25519", privateKey, message)
+const sig = base64url(sig_bytes)</pre>
+    </div>
+
+    <h3>Verification</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">WebCrypto — verification</span></div>
+      <pre><span class="c">// Import vendor's public key from Graph Index (raw format)</span>
+const pub_raw = hex_to_bytes(graph_index_public_key_hex)
+const publicKey = await crypto.subtle.importKey(
+  "raw", pub_raw, { name: "Ed25519" }, false, ["verify"]
+)
+
+const is_valid = await crypto.subtle.verify(
+  "Ed25519",
+  publicKey,
+  base64url_decode(audit_signature.signatures[0].sig),
+  TextEncoder().encode(audit_signature.payload)
+)</pre>
+    </div>
+
+    <div class="callout">
+      <div class="lab">Key rotation</div>
+      <p>Vendors SHOULD publish key rotation events in their Graph Index with a <code>valid_until</code> timestamp on old keys and a <code>valid_from</code> on the new key. Verifiers MUST use the key that was active at the time the artifact was produced (recorded in the artifact's creation context if needed). Historic artifacts signed under a rotated key remain valid if the old key was not revoked.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ §6 OTel ═══ -->
+<div class="section" id="s6">
+  <div class="wrap">
+    <div class="sec-num">Section 6 — New in v0.2</div>
+    <h2>OpenTelemetry Span Mapping</h2>
+    <p>An OpenChainGraph artifact can be exported as an OpenTelemetry span, making decision chains visible in any OTel-compatible APM stack (Datadog, Grafana Tempo, Jaeger, Honeycomb) without new infrastructure. The mapping is read-only — OTel data flows <em>from</em> OpenChainGraph, never the reverse.</p>
+
+    <table class="spec-table">
+      <thead><tr><th>OTel Span Field</th><th>←</th><th>OpenChainGraph Field</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td><code>traceId</code></td><td>←</td><td>Chain root <code>execution_hash</code></td><td>First 16 bytes (32 hex chars) of the depth-0 ancestor's hash</td></tr>
+        <tr><td><code>spanId</code></td><td>←</td><td><code>execution_hash</code></td><td>First 8 bytes (16 hex chars) of this artifact's hash</td></tr>
+        <tr><td><code>parentSpanId</code></td><td>←</td><td><code>chain.parent_hashes[0]</code></td><td>First 8 bytes. For multi-parent nodes, emit one span per parent or use the primary parent</td></tr>
+        <tr><td><code>name</code></td><td>←</td><td><code>tool_id</code></td><td>e.g. <code>ain:art-01</code></td></tr>
+        <tr><td><code>kind</code></td><td>←</td><td>—</td><td>Always <code>INTERNAL</code></td></tr>
+        <tr><td><code>attributes["ocg.mandate_type"]</code></td><td>←</td><td><code>mandate_type</code></td><td>String attribute</td></tr>
+        <tr><td><code>attributes["ocg.mandate_id"]</code></td><td>←</td><td><code>mandate_id</code></td><td>String attribute</td></tr>
+        <tr><td><code>attributes["ocg.chain_depth"]</code></td><td>←</td><td><code>chain.chain_depth</code></td><td>Integer attribute</td></tr>
+        <tr><td><code>attributes["ocg.chaingraph_version"]</code></td><td>←</td><td><code>chaingraph_version</code></td><td>String attribute</td></tr>
+        <tr><td><code>attributes["ocg.buildType"]</code></td><td>←</td><td><code>buildType</code></td><td>String attribute (URI)</td></tr>
+        <tr><td><code>startTimeUnixNano</code></td><td>←</td><td>—</td><td>Set at emission time — not stored in artifact (would break hash reproducibility)</td></tr>
+        <tr><td><code>endTimeUnixNano</code></td><td>←</td><td>—</td><td>Same as <code>startTimeUnixNano</code> for instantaneous decisions</td></tr>
+        <tr><td><code>status.code</code></td><td>←</td><td><code>compliance_flags</code></td><td><code>OK</code> if empty; <code>ERROR</code> if any flag has severity ERROR</td></tr>
+      </tbody>
+    </table>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">JavaScript — OTel OTLP/JSON export snippet</span></div>
+      <pre>function artifactToOtelSpan(artifact, rootHash, emitTimeNs) {
+  const hexSlice = (h, bytes) => h.replace('sha256:','').slice(0, bytes*2)
+  return {
+    traceId:       hexSlice(rootHash, 16),
+    spanId:        hexSlice(artifact.execution_hash, 8),
+    parentSpanId:  artifact.chain.parent_hashes[0]
+                     ? hexSlice(artifact.chain.parent_hashes[0], 8)
+                     : undefined,
+    name:          artifact.tool_id,
+    kind:          1,  <span class="c">// INTERNAL</span>
+    startTimeUnixNano: emitTimeNs,
+    endTimeUnixNano:   emitTimeNs,
+    attributes: [
+      { key: "ocg.mandate_type",       value: { stringValue: artifact.mandate_type } },
+      { key: "ocg.mandate_id",         value: { stringValue: artifact.mandate_id } },
+      { key: "ocg.chain_depth",        value: { intValue:    artifact.chain.chain_depth } },
+      { key: "ocg.chaingraph_version", value: { stringValue: artifact.chaingraph_version } },
+      { key: "ocg.buildType",          value: { stringValue: artifact.buildType } },
+    ],
+    status: {
+      code: artifact.compliance_flags?.some(f => f.severity === 'ERROR') ? 2 : 1
+    }
+  }
+}</pre>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ §7 DCAT ═══ -->
+<div class="section" id="s7">
+  <div class="wrap">
+    <div class="sec-num">Section 7 — New in v0.2</div>
+    <h2>DCAT 3.0 Graph Index</h2>
+    <p>The <strong>Graph Index</strong> (<code>chaingraph.json</code>) is the machine-discoverable catalog of a vendor's OpenChainGraph-conformant tools. v0.2 expresses it as a W3C DCAT 3.0 catalog, making it crawlable by data portals, regulatory reporting platforms, and semantic web processors — without removing any existing fields.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">JSON-LD — Graph Index as DCAT 3.0 Catalog</span><span class="code-note">chaingraph.json at vendor root</span></div>
+      <pre>{
+  <span class="k">"@context"</span>: {
+    <span class="k">"dcat"</span>:  <span class="n">"http://www.w3.org/ns/dcat#"</span>,
+    <span class="k">"ocg"</span>:   <span class="n">"https://ainumbers.co/chaingraph/context/v0.2#"</span>,
+    <span class="k">"prov"</span>:  <span class="n">"http://www.w3.org/ns/prov#"</span>,
+    <span class="k">"dct"</span>:   <span class="n">"http://purl.org/dc/terms/"</span>
+  },
+  <span class="k">"@type"</span>:           <span class="v">"dcat:Catalog"</span>,
+  <span class="k">"@id"</span>:             <span class="v">"https://ainumbers.co/chaingraph/chaingraph.json"</span>,
+  <span class="k">"dct:title"</span>:       <span class="v">"AINumbers OpenChainGraph Suite"</span>,
+  <span class="k">"dct:description"</span>: <span class="v">"48 AP2-emitting, hash-anchored financial decision tools."</span>,
+  <span class="k">"dct:publisher"</span>:   { <span class="k">"@id"</span>: <span class="v">"https://postoaklabs.com"</span>, <span class="k">"dct:title"</span>: <span class="v">"Post Oak Labs"</span> },
+  <span class="k">"ocg:conformance_level"</span>: <span class="v">"L4"</span>,
+  <span class="k">"ocg:mcp_endpoint"</span>: <span class="v">"https://mcp.ainumbers.co/mcp"</span>,
+
+  <span class="k">"dcat:dataset"</span>: [
+    {
+      <span class="k">"@type"</span>:        [<span class="v">"dcat:Dataset"</span>, <span class="v">"ocg:DecisionTool"</span>],
+      <span class="k">"@id"</span>:          <span class="v">"ain:art-01"</span>,
+      <span class="k">"dct:title"</span>:    <span class="v">"AP2 Mandate Chain Validator"</span>,
+      <span class="k">"dct:description"</span>: <span class="v">"Validates AP2 mandate chain integrity with execution_hash."</span>,
+      <span class="k">"ocg:mandate_type"</span>: <span class="v">"ap2_mandate_chain_record"</span>,
+      <span class="k">"ocg:consumes"</span>: [],
+      <span class="k">"ocg:feeds"</span>:    [<span class="v">"ain:art-02"</span>, <span class="v">"ain:art-17"</span>],
+      <span class="k">"ocg:mcp_tool_name"</span>: <span class="v">"validate_ap2_mandate_chain"</span>,
+
+      <span class="c">// Ed25519 signing key published here for artifact verification</span>
+      <span class="k">"ocg:signing_keys"</span>: [
+        {
+          <span class="k">"keyid"</span>:      <span class="v">"sha256:&lt;key_fingerprint&gt;"</span>,
+          <span class="k">"public_key"</span>: <span class="v">"&lt;hex-encoded Ed25519 public key&gt;"</span>,
+          <span class="k">"valid_from"</span>: <span class="v">"2026-01-01"</span>
+        }
+      ],
+
+      <span class="c">// DCAT access service — MCP endpoint for this specific tool</span>
+      <span class="k">"dcat:accessService"</span>: {
+        <span class="k">"@type"</span>:            <span class="v">"dcat:DataService"</span>,
+        <span class="k">"dcat:endpointURL"</span>: <span class="v">"https://mcp.ainumbers.co/mcp"</span>,
+        <span class="k">"dct:conformsTo"</span>:   <span class="v">"https://modelcontextprotocol.io/spec/2025-11-05"</span>
+      }
+    }
+    <span class="c">// ... one entry per tool ...</span>
+  ]
+}</pre>
+    </div>
+
+    <div class="callout purple">
+      <div class="lab">Graph Index as orchestration recipe</div>
+      <p>The <code>ocg:consumes</code> and <code>ocg:feeds</code> edges are the machine-readable map agents use to plan a full chain <em>before calling anything</em>. No existing standard provides this. DCAT gives the catalog a standard container and makes it crawlable by data portals; the <code>ocg:</code> namespace terms are what make it actionable by agents.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ §8 ISO 20022 Semantic Profile ═══ -->
+<div class="section" id="s8">
+  <div class="wrap">
+    <div class="sec-num">Section 8 — New in v0.3</div>
+    <h2>ISO 20022 Semantic Profile</h2>
+    <p>v0.2 gave the provenance <em>envelope</em> a semantic standard (W3C PROV-DM). v0.3 gives the financial <em>payload</em> one. The ISO 20022 semantic profile is an <strong>optional, additive overlay</strong> that maps a curated subset of payload fields to ISO 20022 business elements and adopts the ISO external code lists by reference. It is <strong>minimal by design</strong> — amount, party, and agent fields only — and it never enters the <code>execution_hash</code> preimage (§2 is unchanged).</p>
+
+    <div class="callout gold">
+      <div class="lab">Aligned, not registered</div>
+      <p>OpenChainGraph is <strong>ISO 20022-aligned</strong>, not a registered ISO 20022 message. ISO 20022 is governed by the ISO Registration Authority / SWIFT. The <code>iso20022:</code> terms below are a crosswalk <em>named after</em> ISO 20022 business elements (ISO 20022 publishes no official JSON-LD vocabulary). Tools do not generate or transmit live ISO 20022 messages — they emit decision artifacts whose financial fields are interpretable by ISO 20022-native systems.</p>
+    </div>
+
+    <h4>Published context URL: <code>https://ainumbers.co/chaingraph/context/v0.3/iso20022-context.jsonld</code></h4>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">JSON — artifact with the profile applied</span><span class="code-note">▲ @context is an array; payload fields carry ISO 20022-aligned names</span></div>
+      <pre>{
+  <span class="k">"@context"</span>: [
+    <span class="v">"https://ainumbers.co/chaingraph/context/v0.3/context.jsonld"</span>,
+    <span class="v new">"https://ainumbers.co/chaingraph/context/v0.3/iso20022-context.jsonld"</span>
+  ],
+  <span class="k">"chaingraph_version"</span>: <span class="v">"0.3.0"</span>,
+  <span class="k">"tool_id"</span>: <span class="v">"ain:rca-03"</span>,
+  <span class="k">"mandate_type"</span>: <span class="v">"compliance_mandate"</span>,
+  <span class="k">"output_payload"</span>: {
+    <span class="k">"instructed_amount"</span>: { <span class="k">"amount"</span>: <span class="v">"15000.00"</span>, <span class="k">"currency"</span>: <span class="v">"EUR"</span> },  <span class="c">// ActiveCurrencyAndAmount · Ccy=ISO 4217</span>
+    <span class="k">"debtor"</span>:    { <span class="k">"party_name"</span>: <span class="v">"ACME SA"</span>,  <span class="k">"lei"</span>: <span class="v">"529900T8BM49AURSDO55"</span> },  <span class="c">// ISO 17442</span>
+    <span class="k">"creditor"</span>:  { <span class="k">"party_name"</span>: <span class="v">"Beta GmbH"</span>, <span class="k">"lei"</span>: <span class="v">"391200X3K8N4WLB9AB12"</span> },
+    <span class="k">"debtor_agent"</span>:   { <span class="k">"bicfi"</span>: <span class="v">"DEUTDEFFXXX"</span> },  <span class="c">// BICFI · ISO 9362</span>
+    <span class="k">"creditor_agent"</span>: { <span class="k">"bicfi"</span>: <span class="v">"BNPAFRPPXXX"</span> },
+    <span class="k">"settlement_date"</span>: <span class="v">"2026-11-23"</span>,  <span class="c">// IntrBkSttlmDt · ISO 8601</span>
+    <span class="k">"remittance_information"</span>: <span class="v">"INV-2026-0042"</span>  <span class="c">// RmtInf</span>
+  }
+}</pre>
+    </div>
+
+    <h3>Field mapping</h3>
+    <table class="spec-table">
+      <thead><tr><th>OCG payload field</th><th>ISO 20022 business element</th><th>External code set</th></tr></thead>
+      <tbody>
+        <tr><td><code>amount</code></td><td>ActiveCurrencyAndAmount</td><td>—</td></tr>
+        <tr><td><code>currency</code></td><td>Ccy / CurrencyCode</td><td>ISO 4217</td></tr>
+        <tr><td><code>country</code></td><td>CountryCode</td><td>ISO 3166-1 alpha-2</td></tr>
+        <tr><td><code>debtor</code> / <code>creditor</code></td><td>Debtor / Creditor (PartyIdentification)</td><td>—</td></tr>
+        <tr><td><code>lei</code></td><td>OrganisationIdentification / LEI</td><td>ISO 17442</td></tr>
+        <tr><td><code>debtor_agent</code> / <code>creditor_agent</code></td><td>DebtorAgent / CreditorAgent (FinInstnId)</td><td>—</td></tr>
+        <tr><td><code>bicfi</code></td><td>BICFI</td><td>ISO 9362</td></tr>
+        <tr><td><code>iban</code></td><td>IBAN (CashAccount)</td><td>ISO 13616</td></tr>
+        <tr><td><code>settlement_date</code></td><td>IntrBkSttlmDt</td><td>ISO 8601</td></tr>
+        <tr><td><code>remittance_information</code></td><td>RmtInf</td><td>—</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="lab">Already in the suite</div>
+      <p>RCA-03 (<code>verify_address_migration_batch</code>) already validates ISO 20022 pacs.008 PostalAddress24 structured addresses for the SWIFT CBPR+ structured-address mandate (Nov 2026). The profile formalizes that usage into a declared crosswalk. A full practitioner walkthrough — code-list validators (ISO 4217/3166/9362/13616/17442) and a pacs.008 crosswalk — is in the <a href="guide-iso20022.html">ISO 20022 integration guide</a>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ §9 Party Identity ═══ -->
+<div class="section" id="s9">
+  <div class="wrap">
+    <div class="sec-num">Section 9 — New in v0.3</div>
+    <h2>Party Identity — LEI &amp; did:key</h2>
+    <p>v0.3 formalizes two optional identity anchors that already appeared informally in the v0.2 guides. Both are optional; neither changes the hash preimage.</p>
+
+    <h3>did:key as the recommended keyid</h3>
+    <p>The in-toto signature envelope's <code>keyid</code> (§4) SHOULD be a <code>did:key</code> identifier — a multicodec-prefixed, base58btc encoding of the raw Ed25519 public key (the <code>z6Mk…</code> form). This makes the signer self-describing and resolvable without a separate key registry, while remaining compatible with the Graph Index <code>signing_keys</code> lookup (§7).</p>
+
+    <h3>LEI for regulated party identity</h3>
+    <p>A publisher or tool MAY carry an ISO 17442 Legal Entity Identifier. This binds an OpenChainGraph vendor — and, where relevant, the signing key — to a regulator-grade legal-entity anchor that banks, PSPs, and supervisors already consume. The LEI is the natural identity bridge between the §8 ISO 20022 profile (where debtor/creditor parties carry LEIs) and the §4/§5 signing identity.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">JSON — optional identity fields</span></div>
+      <pre>{
+  <span class="k">"publisher"</span>: {
+    <span class="k">"name"</span>: <span class="v">"Post Oak Labs"</span>,
+    <span class="k">"lei"</span>:  <span class="v new">"&lt;ISO 17442 LEI, if registered&gt;"</span>       <span class="c">// optional</span>
+  },
+  <span class="k">"audit_signature"</span>: {
+    <span class="k">"signatures"</span>: [
+      { <span class="k">"keyid"</span>: <span class="v new">"did:key:z6MkrJVnaZkeFzdQyMZu1cgjaeW7MoFaNKg4tLCf4g3kEhWh"</span>, <span class="k">"sig"</span>: <span class="v">"…"</span> }
+    ]
+  }
+}</pre>
+    </div>
+
+    <div class="callout purple">
+      <div class="lab">Pairs with the agentic-identity tools</div>
+      <p>This aligns the provenance layer with the suite's KYA-OS / EUDI-wallet tools and the W3C Verifiable Credentials / DID ecosystem. See the <a href="guide-ed25519.html">Ed25519</a> and <a href="guide-intoto.html">in-toto</a> guides for key lifecycle and envelope details.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ §10 OKF Companion Bundle ═══ -->
+<div class="section" id="s10">
+  <div class="wrap">
+    <div class="sec-num">Section 10 — New in v0.3</div>
+    <h2>OKF Companion Bundle</h2>
+    <p>v0.3 publishes an <strong>Open Knowledge Format</strong> (OKF) companion bundle — a directory of markdown concept files, one per Graph Index node — <strong>auto-generated from <code>chaingraph.json</code></strong>. It is the narrative knowledge layer that complements the machine-readable DCAT catalog (§7): DCAT is the catalog an agent <em>plans</em> a chain from; OKF is the curated context an agent or human <em>reads</em> to learn what a tool means and when to use it.</p>
+
+    <div class="callout">
+      <div class="lab">Two layers, not two formats for one thing</div>
+      <p><strong>OKF = context-in</strong> (knowledge read before acting). <strong>OpenChainGraph = provenance-out</strong> (the decision artifact produced and proven after acting). An OKF concept document is <em>knowledge, never a decision artifact</em> — it MUST NOT carry an <code>execution_hash</code> or <code>audit_signature</code>. The two are kept strictly separate.</p>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">Bundle layout — generated, never hand-edited</span></div>
+      <pre>okf/
+├── index.md                 <span class="c"># root · progressive disclosure</span>
+├── log.md                   <span class="c"># generation history</span>
+├── mandate-types/
+│   ├── index.md
+│   └── &lt;mandate_type&gt;.md
+└── tools/
+    ├── index.md
+    └── &lt;tool_id&gt;.md         <span class="c"># one concept per live node; consumes/feeds → markdown links</span></pre>
+    </div>
+
+    <p>Each concept carries OKF YAML frontmatter (<code>type</code>, <code>title</code>, <code>description</code>, <code>resource</code>, <code>tags</code>, <code>timestamp</code>); the node's <code>consumes</code>/<code>feeds</code> edges become markdown links between concepts, reproducing the graph. The bundle is regenerated on every Graph Index change and is fully reversible — nothing in OpenChainGraph's verification path depends on it. The generator and consumer walkthrough are in the <a href="guide-okf.html">OKF integration guide</a>.</p>
+
+    <div class="callout gold">
+      <div class="lab">Maturity note</div>
+      <p>OKF is a v0.1 specification (published June 2026). It is adopted here as a <strong>companion artifact only</strong>. Tie nothing in artifact verification to it; treat the bundle as a generated, swappable discovery surface.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ §11 Profile Conformance (new in v0.3.1) ═══ -->
+<div class="section" id="s11">
+  <div class="wrap">
+    <div class="sec-num">Section 11 — New in v0.3.1</div>
+    <h2>Profile Conformance</h2>
+    <p>v0.3 introduced ISO 20022 alignment via an inline <code>semantic_profile</code> string token. v0.3.1 makes that conformance a first-class, machine-resolvable assertion using the <strong>W3C Profiles Vocabulary (PROF)</strong> and <strong>Content Negotiation by Profile</strong>: a profile is a <code>dct:Standard</code> published at a <strong>dereferenceable URI</strong> and declared with <code>dct:conformsTo</code>. This is fully additive — the <code>execution_hash</code> preimage is unchanged and <code>semantic_profile</code> tokens stay valid as registered aliases.</p>
+
+    <div class="callout gold">
+      <div class="lab">Uniform mechanism, truthful claims</div>
+      <p>Every node declares conformance the same way (<code>dct:conformsTo</code>), but only declares what it <em>truthfully</em> conforms to. ISO 20022 payment/party profiles are applied solely to nodes with the matching payload; a VaR engine or DORA classifier carries no ISO 20022 profile. Forcing a payment profile onto a non-payment node would be a false conformance claim, which this design avoids.</p>
+    </div>
+
+    <h3>Published profiles</h3>
+    <table class="spec-table">
+      <thead><tr><th>Token (alias)</th><th>Profile URI (dereferenceable)</th><th>Applies to</th></tr></thead>
+      <tbody>
+        <tr><td><code>iso20022:pacs.008-subset</code></td><td><code>https://ainumbers.co/chaingraph/profiles/iso20022/pacs008-subset.jsonld</code></td><td>Payment/settlement nodes (amount + parties + agents) — e.g. x402 settlement, VoP, ISO 20022 address.</td></tr>
+        <tr><td><code>iso20022:party-identification</code> <span class="badge-new">new</span></td><td><code>https://ainumbers.co/chaingraph/profiles/iso20022/party-identification.jsonld</code></td><td>Party/issuer/legal-entity identity without a transaction (<code>party_name</code> + <code>lei</code>). Named after the ISO 20022 PartyIdentification element used in the REDA/ACMT families.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Token → URI registry</h3>
+    <p>The authoritative token↔URI map is published at <code>chaingraph-standard/profiles/registry.json</code> (Content-Negotiation-by-Profile permits a short token alongside the mandatory URI). Each profile URI dereferences to a PROF <code>prof:Profile</code> document listing its schema (the v0.3 ISO 20022 context) and guidance resources.</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">JSON — artifact / graph-index node with v0.3.1 conformance</span></div>
+      <pre>{
+  <span class="k">"@context"</span>: [
+    <span class="v">"https://ainumbers.co/chaingraph/context/v0.3/context.jsonld"</span>,
+    <span class="v">"https://ainumbers.co/chaingraph/context/v0.3/iso20022-context.jsonld"</span>
+  ],
+  <span class="k">"chaingraph_version"</span>: <span class="v">"0.3.1"</span>,
+  <span class="k">"ocg:semantic_profile"</span>: <span class="v">"iso20022:pacs.008-subset"</span>,        <span class="c">// token alias (retained)</span>
+  <span class="k">"dct:conformsTo"</span>: [<span class="v new">"https://ainumbers.co/chaingraph/profiles/iso20022/pacs008-subset.jsonld"</span>]  <span class="c">// authoritative, dereferenceable</span>
+}</pre>
+    </div>
+
+    <div class="callout">
+      <div class="lab">Hash preimage unchanged</div>
+      <p><code>@context</code>, <code>ocg:semantic_profile</code>, and <code>dct:conformsTo</code> are all outside the <code>execution_hash</code> preimage (sorted-key SHA-256 over <code>{policy_parameters, output_payload}</code>). A verifier correct for v0.1/v0.2/v0.3 computes identical hashes for v0.3.1 artifacts. See the <a href="guide-profiles.html">profile-conformance guide</a>.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ §12 Compute Binding (new in v0.4) ═══ -->
+<div class="section" id="s12">
+  <div class="wrap">
+    <div class="sec-num">Section 12</div>
+    <h2>Compute Binding <span style="font-size:.75em;font-weight:400;color:var(--green)">new in v0.4</span></h2>
+    <p>OpenChainGraph v0.4 introduces <strong>Compute Binding</strong> — the mechanism by which an MCP tool computes a node's decision function <em>server-side</em> and returns a fully verifiable <code>v0.4</code> artifact in a single round-trip, instead of delegating to the browser. This makes every <code>gpu:false</code> node with a registered kernel <em>agent-native</em>: an AI agent can call the tool, receive the structured <code>output_payload</code> and <code>execution_hash</code>, and immediately chain to downstream tools without requiring a browser session.</p>
+
+    <h3>§12.1 — compute_capability field</h3>
+    <p>Every live node in <code>chaingraph.json</code> carries a <code>compute_capability</code> field that declares how the Worker will dispatch it:</p>
+
+    <pre>{
+  <span class="k">"tool_id"</span>:            <span class="v">"art-05-eu-ai-act-credit-scoring-conformity"</span>,
+  <span class="k">"gpu"</span>:                <span class="n">false</span>,
+  <span class="k">"compute_capability"</span>: <span class="v">"server"</span>   <span class="c">// "server" | "browser" | "auto"</span>
+}</pre>
+
+    <table style="width:100%;border-collapse:collapse;font-size:.82rem;margin:1rem 0">
+      <thead>
+        <tr style="background:rgba(255,255,255,.06)">
+          <th style="padding:.5rem .8rem;text-align:left;border-bottom:1px solid rgba(255,255,255,.1)">Value</th>
+          <th style="padding:.5rem .8rem;text-align:left;border-bottom:1px solid rgba(255,255,255,.1)">Condition</th>
+          <th style="padding:.5rem .8rem;text-align:left;border-bottom:1px solid rgba(255,255,255,.1)">Worker behaviour</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="padding:.45rem .8rem;border-bottom:1px solid rgba(255,255,255,.07)"><code>"server"</code></td>
+          <td style="padding:.45rem .8rem;border-bottom:1px solid rgba(255,255,255,.07)"><code>gpu:false</code> + kernel registered in <code>kernels/index.mjs</code></td>
+          <td style="padding:.45rem .8rem;border-bottom:1px solid rgba(255,255,255,.07)">Runs the kernel, returns artifact. Falls back to browser delegation if <code>compute:"browser"</code> is passed.</td>
+        </tr>
+        <tr>
+          <td style="padding:.45rem .8rem;border-bottom:1px solid rgba(255,255,255,.07)"><code>"browser"</code></td>
+          <td style="padding:.45rem .8rem;border-bottom:1px solid rgba(255,255,255,.07)"><code>gpu:true</code></td>
+          <td style="padding:.45rem .8rem;border-bottom:1px solid rgba(255,255,255,.07)">Always returns the browser delegation URL + structured metadata. Compute runs client-side.</td>
+        </tr>
+        <tr>
+          <td style="padding:.45rem .8rem"><code>"auto"</code></td>
+          <td style="padding:.45rem .8rem"><code>gpu:false</code> + no kernel yet</td>
+          <td style="padding:.45rem .8rem">Behaves like <code>"browser"</code> today; transitions to <code>"server"</code> when a kernel is added — no schema change needed.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3>§12.2 — GPU delegation and the compute parameter</h3>
+    <p>Callers may override dispatch per-call using the <code>compute</code> input parameter on any ChainGraph MCP tool:</p>
+    <pre>{
+  <span class="k">"compute"</span>: <span class="v">"auto"</span>    <span class="c">// default — server for gpu:false nodes with kernels</span>
+  <span class="k">"compute"</span>: <span class="v">"server"</span>  <span class="c">// force server-side (errors if no kernel)</span>
+  <span class="k">"compute"</span>: <span class="v">"browser"</span> <span class="c">// always return browser delegation URL</span>
+}</pre>
+    <p>Nodes with <code>gpu:true</code> ignore <code>compute</code> and always delegate to the browser — the GPU dependency cannot be satisfied server-side. Future nodes may carry a per-node <code>gpu_fallback</code> flag for seeded LCG reduced-path approximation, but this is not part of v0.4.</p>
+
+    <h3>§12.3 — Kernel pattern</h3>
+    <p>A kernel is a pure ESM module at <code>repo/chaingraph/kernels/&lt;tool-id&gt;.kernel.mjs</code> exporting three symbols:</p>
+    <pre><span class="c">// compute(pp) → { output_payload, compliance_flags }
+// Pure: no DOM, no window, no network, no Date.now().
+// policy_parameters is passed verbatim so the execution_hash anchors the full input.</span>
+export function compute(policy_parameters) { … }
+
+<span class="c">// buildArtifact(pp, opts) → Promise&lt;v0.4 artifact object&gt;
+// Calls compute(), then hashes with executionHash() from _hash.mjs.</span>
+export async function buildArtifact(pp, { now, parent_hashes, parent_tool_ids, chain_depth } = {}) { … }
+
+<span class="c">// Static metadata for the Worker registry.</span>
+export const meta = { tool_id, tool_version, gpu: false, mandate_type };</pre>
+    <p>Kernels are vendored from <code>repo/chaingraph/kernels/</code> into both <code>mcp-apps-poc/kernels/</code> (bundled into the Worker by wrangler/esbuild) and <code>mcp-apps-poc/data/kernels/</code> (served as static assets) by running <code>node generate.mjs</code> before every push.</p>
+
+    <h3>§12.4 — Privacy boundary</h3>
+    <p>The zero-egress contract is preserved for all compute modes. Server-side kernels are pure functions: they receive <code>policy_parameters</code>, run deterministic logic, and return <code>output_payload</code>. No policy parameters, outputs, or user data are logged, stored, or transmitted beyond the JSON-RPC response. The only telemetry written is structural metadata (tool name, latency, success/error flag, and a salted one-way hash of the caller IP — never the payload). <code>gpu:true</code> nodes continue to run entirely in the user's browser with zero network egress.</p>
+
+    <h3>§12.5 — v0.4 artifact schema delta</h3>
+    <p>The v0.4 artifact adds two fields to the v0.3.1 envelope:</p>
+    <pre>{
+  <span class="k">"chaingraph_version"</span>: <span class="v">"0.4.0"</span>,           <span class="c">// bumped from 0.3.x</span>
+  <span class="k">"compute_mode"</span>:       <span class="v">"server"</span>,           <span class="c">// "server" | "browser" — new in v0.4</span>
+  …                                          <span class="c">// all v0.3 fields retained</span>
+}</pre>
+    <p>The <strong>hash preimage definition is unchanged</strong> — <code>execution_hash</code> is still <code>SHA-256(JCS({ policy_parameters, output_payload }))</code>. A v0.4 artifact is verifiable by any v0.3 verifier that ignores unknown fields.</p>
+  </div>
+</div>
+
+<!-- ═══ §13 Export Profiles (new in v0.4) ═══ -->
+<div class="section" id="s13">
+  <div class="wrap">
+    <div class="sec-num">Section 13</div>
+    <h2>Export Profiles <span style="font-size:.75em;font-weight:400;color:var(--green)">new in v0.4</span></h2>
+    <p>OpenChainGraph v0.4 adds <strong>export profiles</strong> — generated, non-canonical renderings of an already-verified artifact, produced <em>after</em> <code>execution_hash</code> is computed and <strong>excluded from the hash preimage</strong>. They exist so the cryptographic anchor stays attached at the last mile — where a human reviewer, a downstream pipeline, or a regulator actually consumes the decision — instead of breaking the provenance chain the moment someone hand-copies <code>output_payload</code> into a spreadsheet, board memo, or filing.</p>
+    <p>Export profiles follow the exact precedent of the <strong>OKF companion bundle (§10)</strong>: a generated view, never hand-edited, never independently verifiable, fully swappable, and additive — no existing tool, kernel, or verifier changes to remain v0.4-valid.</p>
+
+    <h3>§13.1 — The <code>chaingraph_export</code> umbrella</h3>
+    <p>Every export format is a documented sub-profile under one umbrella term, <code>chaingraph_export:&lt;format&gt;</code>:</p>
+    <pre><span class="k">chaingraph_export:xlsx</span>   <span class="c">// analyst / board spreadsheet</span>
+<span class="k">chaingraph_export:pdf</span>    <span class="c">// signed board / audit one-pager</span>
+<span class="k">chaingraph_export:csv</span>    <span class="c">// pipeline-tabular sibling of xlsx</span>
+<span class="k">chaingraph_export:xbrl</span>   <span class="c">// regulator-submission profile (taxonomy per regime)</span></pre>
+
+    <h3>§13.2 — Conformance rules (every export profile MUST)</h3>
+    <p>1. Be generated solely from the verified artifact's <code>output_payload</code> (+ optionally <code>policy_parameters</code>) — never hand-authored.<br>
+    2. Embed a metadata block carrying <code>tool_id</code>, <code>execution_hash</code>, <code>chaingraph_version</code>, <code>compute_mode</code>, and (if present) <code>audit_signature.signatures[0].keyid</code>, plus a link/QR to the canonical JSON artifact or its verification endpoint.<br>
+    3. <strong>NOT</strong> carry a new <code>execution_hash</code> and <strong>NOT</strong> be treated as independently verifiable — it is a view, not a fact. Verification always routes back to the canonical JSON.<br>
+    4. Be optional and additive — absence of an exporter never invalidates a tool.<br>
+    5. Be <strong>deterministic</strong>: same artifact + same exporter version → byte-stable output (static per-<code>mandate_type</code> templates, sorted rows, fixed number formats), so two parties can confirm they hold the same rendering.</p>
+
+    <h3>§13.3 — Generation: server-side (Cloudflare Worker)</h3>
+    <p>Export generation runs in the Worker — the same runtime as the Compute-Binding kernels — as one canonical generator rather than N drifting client implementations. The rationale mirrors §12: agent-native, single round-trip, reproducible. The zero-egress/privacy boundary of §12.4 applies unchanged: exporters are pure functions over an artifact the caller already holds; no payload is logged, stored, or transmitted beyond the JSON-RPC response. (Strict client-side generation remains permissible for an air-gapped deployment using the published exporter spec, but the reference generator is server-side.) Exporters live at <code>repo/chaingraph/exporters/&lt;format&gt;/</code> (parallel to <code>kernels/</code>), each a pure <code>buildExport(artifact) → Uint8Array</code>, vendored into the Worker by <code>generate.mjs</code> on the same push (same two-repo discipline as kernels).</p>
+
+    <h3>§13.4 — MCP surface: the <code>export_artifact</code> tool</h3>
+    <p>A single new read-only MCP tool — not a <code>format</code> parameter on every tool (which would inflate all schemas), nor an out-of-band endpoint (which would split the agent-callable story). This follows MCP best practice: focused, domain-aware tools an agent can reason about, with one tool owning the render concern.</p>
+    <pre><span class="c">// Tool: export_artifact   (readOnlyHint: true)</span>
+{
+  <span class="k">"artifact"</span>:       <span class="c">// full v0.4 artifact object (REQUIRED — stateless Worker, no cache)</span>
+  <span class="k">"format"</span>:         <span class="v">"xlsx" | "pdf" | "csv" | "xbrl"</span>,
+  <span class="k">"xbrl_taxonomy"</span>:  <span class="v">"&lt;regime id&gt;"</span>   <span class="c">// required only when format = xbrl (§13.8)</span>
+}
+<span class="c">// Returns:</span>
+{
+  <span class="k">"format"</span>:      <span class="v">"xlsx"</span>,
+  <span class="k">"filename"</span>:    <span class="v">"&lt;tool_id&gt;-&lt;short_hash&gt;.xlsx"</span>,
+  <span class="k">"media_type"</span>:  <span class="v">"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"</span>,
+  <span class="k">"bytes_base64"</span>: <span class="v">"…"</span>,           <span class="c">// standard base64 (NOT url-safe) — avoids client decode bugs</span>
+  <span class="k">"metadata"</span>:    { <span class="k">"tool_id"</span>, <span class="k">"execution_hash"</span>, <span class="k">"chaingraph_version"</span>, <span class="k">"compute_mode"</span> }
+}</pre>
+    <p>The agent flow stays end-to-end: call a compute tool → receive JSON artifact + <code>execution_hash</code> → call <code>export_artifact</code> with that artifact → receive the rendered file. Both calls are <code>readOnlyHint:true</code>. For large outputs (big GPU-batch CSVs), the Worker returns an <strong>MCP resource</strong> (URI-addressable, read-only) instead of an oversized inline blob. The tool rejects any <code>(tool, format)</code> pair not present in the node's <code>export_capability</code> (§13.10) — a deterministic, discoverable failure.</p>
+
+    <h3>§13.5 — <code>chaingraph_export:xlsx</code></h3>
+    <p>Workbook convention:</p>
+    <pre><span class="k">Sheet "Decision"</span>    <span class="c">// verdict, tool_id, mandate_type, timestamp;</span>
+                    <span class="c">// metadata block (execution_hash, chaingraph_version, compute_mode, keyid); QR</span>
+<span class="k">Sheet "Data"/…</span>    <span class="c">// tabular output_payload — percentile tables, batch rows, distributions</span>
+<span class="k">Sheet "Provenance"</span>  <span class="c">// optional: chain.parent_hashes, parent_tool_ids, compliance_flags[]</span></pre>
+    <p>Generated with a Workers-compatible OOXML writer (pure JS/WASM, no Node <code>fs</code>); a minimal hand-rolled OOXML writer is acceptable given the simple, deterministic structure. Pilot tools: <code>compute_rwa_scenarios</code>, <code>validate_einvoice_batch</code>, <code>simulate_vop_matching</code>, <code>run_liquidity_stress_test</code> — all already tabular in shape.</p>
+
+    <h3>§13.6 — <code>chaingraph_export:pdf</code></h3>
+    <p>Board/audit one-pager: verdict headline, key <code>output_payload</code> fields as prose/table, <code>execution_hash</code> + signing <code>keyid</code> in the footer, and a QR encoding the verification URL. Uses a <strong>static template per <code>mandate_type</code></strong> (one layout for <code>attestation_mandate</code>, one for <code>compliance_mandate</code>, etc.) so output is reproducible artifact-to-artifact — no freeform layout. Best fit: <code>precheck_reserve_attestation</code>, <code>assess_ai_act_conformity</code>, <code>classify_dora_incident</code>. Server-side deterministic renderer.</p>
+
+    <h3>§13.7 — <code>chaingraph_export:csv</code></h3>
+    <p>The pipeline-tabular sibling of xlsx — same extraction, simpler serialization (near-free once xlsx exists). For data-engineering consumers and large GPU-batch outputs (<code>run_liquidity_stress_test</code> 1,000×250, <code>simulate_stablecoin_reserve</code> 1,000×90). One CSV per logical table; a manifest row carries the metadata block. <em>(Parquet is a future columnar option once a concrete pipeline consumer asks — not in v0.4, to avoid Arrow/Parquet Workers-runtime dependency weight.)</em></p>
+
+    <h3>§13.8 — <code>chaingraph_export:xbrl</code> (regulator-submission profile)</h3>
+    <p>The strategic profile: render artifacts as XBRL/iXBRL so they are <em>submission-ready</em>, not merely <em>analyst-readable</em>. XBRL requires a <strong>taxonomy per regulatory regime</strong> — there is no single mapping. v0.4 defines the umbrella, the <code>export_artifact</code> interface (<code>xbrl_taxonomy</code> selector), and the initial mapping; each regime's concept mapping is a tracked work item.</p>
+    <table class="spec-table">
+      <thead>
+        <tr><th><code>xbrl_taxonomy</code></th><th>Regime / taxonomy</th><th>Maps from</th><th>v0.4 status</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>eba-corep-own-funds</code></td><td>EBA COREP (capital / RWA)</td><td><code>compute_basel31_delta</code>, <code>compute_rwa_scenarios</code>, <code>optimize_settlement_capital</code></td><td><strong>Pilot</strong></td></tr>
+        <tr><td><code>eba-corep-lcr-nsfr</code></td><td>EBA COREP LCR/NSFR (liquidity)</td><td><code>run_liquidity_stress_test</code></td><td><strong>Pilot</strong></td></tr>
+        <tr><td><code>eba-dora-ict</code></td><td>EBA DORA ICT register / incident ITS</td><td><code>classify_dora_incident</code></td><td>Mapped, lower priority</td></tr>
+        <tr><td><code>ocg-ext:attestation</code></td><td>OCG extension (no regulator standard yet)</td><td><code>precheck_reserve_attestation</code> (GENIUS); US Treasury clearing tools</td><td><strong>Custom extension</strong></td></tr>
+      </tbody>
+    </table>
+    <p>Rule: <strong>No fabricated taxonomy concepts</strong> — every concept must trace to a published regulator element or an explicitly-OCG extension element. The lightweight default is the <strong>OCG extension taxonomy</strong> <code>ocg-ext</code>, published by Post Oak Labs at <code>chaingraph/xbrl/ocg-ext/ocg-ext-2026.xsd</code>: a small, self-contained, regime-neutral XBRL 2.1 schema that produces a fully <em>validatable</em> instance (verify with any XBRL processor, e.g. Arelle) with no external taxonomy dependency. Mapping into a regulator taxonomy (e.g. <strong>EBA COREP</strong> for EU capital &amp; liquidity) is <strong>optional and pull-driven</strong> — undertaken only when a real submission to that regulator is required, since it is version-coupled and dimensional. Every XBRL export records its source taxonomy + version in-context.</p>
+
+    <h3>§13.9 — Three layers, not three formats for one thing</h3>
+    <p>v0.4 extends §10's "two layers" framing to three: <code>provenance-out (JSON)</code> → <code>knowledge-in (OKF)</code> → <code>rendered-for-review (xlsx / pdf / csv / xbrl)</code>. All three derive from the same verified artifact; only the JSON layer is canonical and hash-anchored.</p>
+
+    <h3>§13.10 — <code>export_capability</code> discovery field</h3>
+    <p>Mirroring <code>compute_capability</code>, every live node in <code>chaingraph.json</code> MAY declare which export profiles it supports, so MCP clients/agents discover formats <em>before</em> calling <code>export_artifact</code>:</p>
+    <pre>{
+  <span class="k">"tool_id"</span>:            <span class="v">"compute_rwa_scenarios…"</span>,
+  <span class="k">"compute_capability"</span>: <span class="v">"server"</span>,
+  <span class="k">"export_capability"</span>:  [<span class="v">"xlsx"</span>, <span class="v">"csv"</span>, <span class="v">"xbrl:eba-corep-own-funds"</span>]
+}</pre>
+    <p>Absent or <code>[]</code> → JSON-only (still v0.4-valid). <code>xbrl:&lt;taxonomy-id&gt;</code> entries name a specific taxonomy from §13.8. The Graph Index / DCAT surface (§7) gains a discovery signal symmetric with <code>compute_capability</code>.</p>
+
+    <div class="callout">
+      <div class="lab">Hash preimage unchanged</div>
+      <p>Export profiles are generated downstream of <code>execution_hash = SHA-256(JCS({policy_parameters, output_payload}))</code> and never alter it. A v0.4 artifact with exports remains verifiable by any v0.3 verifier that ignores unknown fields.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ §14 Changelog ═══ -->
+<div class="section" id="s14">
+  <div class="wrap">
+    <div class="sec-num">Section 14</div>
+    <h2>Changelog</h2>
+
+    <h3 style="margin-top:.4rem">v0.3.1 → v0.4.0 — 2026-06-19</h3>
+    <div style="margin-top:.6rem">
+      <div class="change-row">
+        <span class="change-ref">§13 (new)</span>
+        <span class="change-desc"><strong>Export Profiles.</strong> Added the <code>chaingraph_export</code> umbrella with sub-profiles <code>xlsx</code>, <code>pdf</code>, <code>csv</code>, <code>xbrl</code> — generated, hash-excluded, server-side (Worker) renderings of a verified artifact. Added the read-only <code>export_artifact</code> MCP tool (full-artifact input; standard-base64 blob or MCP resource output) and the per-node <code>export_capability</code> field in <code>chaingraph.json</code>. XBRL defines a taxonomy-per-regime mapping (EBA COREP own-funds + LCR/NSFR pilots; <code>ocg-ext:*</code> for regimes without a standard taxonomy). Hash preimage unchanged.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">§12 (new)</span>
+        <span class="change-desc"><strong>Compute Binding.</strong> Added <code>compute_capability</code> field to all live nodes (<code>"server"</code> | <code>"browser"</code> | <code>"auto"</code>); added <code>compute</code> override parameter on all ChainGraph MCP tools; <code>compute_mode</code> field in artifact envelope. Kernels extracted for art-05 (EU AI Act credit-scoring conformity), art-06 (GENIUS Act reserve attestation), art-09 (DORA incident classifier), art-29 (DORA readiness diagnostic) — joining art-01, art-03, art-04, art-11, art-12. <code>chaingraph_version</code> advanced to <code>"0.4.0"</code> in artifacts. Hash preimage unchanged.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">CI gate</span>
+        <span class="change-desc"><strong>Layer 3 mcp_name uniqueness check</strong> in <code>validate-chains.mjs</code>. Errors pre-deploy if any two live nodes share an <code>mcp_name</code>, or if any node name collides with a PILOT widget or utility tool name — the class of registration crash that caused the 2026-06-19 outage. Complements the existing runtime dedup guard in <code>worker.mjs</code>.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">CI gate</span>
+        <span class="change-desc"><strong>Post-deploy /mcp smoke test</strong> (<code>scripts/smoke-mcp.mjs</code>). Performs a real MCP <code>initialize</code> handshake against the live endpoint after every deploy, with 6 retries and 4s edge-propagation delay. Catches runtime registration throws that the bundle dry-run cannot catch. A failure turns the deploy job red immediately.</span>
+      </div>
+    </div>
+
+    <h3 style="margin-top:1.6rem">Maintenance — 2026-06-18 (no version change)</h3>
+    <div style="margin-top:.6rem">
+      <div class="change-row">
+        <span class="change-ref">§2 Hashing</span>
+        <span class="change-desc"><strong>Execution-hash canonicalization.</strong> Every OpenChainGraph tool computes <code>execution_hash</code> as a WebCrypto SHA-256 over an RFC 8785 (JSON Canonicalization Scheme)&ndash;aligned serialization of <code>{policy_parameters, output_payload}</code> &mdash; recursive lexicographic key sort, minimal whitespace, constrained to the I-JSON subset &mdash; so any party can independently reproduce the hash from an exported artifact. Verification normalizes the optional <code>sha256:</code> prefix on either side. This canonicalization is enforced in CI by a parity self-test, a forbidden-pattern lint, and golden-snapshot checks. <strong>Hash preimage definition unchanged from §2; spec version stays 0.3.1.</strong></span>
+      </div>
+    </div>
+
+    <h3 style="margin-top:1.6rem">v0.3 → v0.3.1</h3>
+    <div style="margin-top:.6rem">
+      <div class="change-row">
+        <span class="change-ref">§11</span>
+        <span class="change-desc">Formalized <strong>profile conformance</strong>: profiles published as dereferenceable URIs declared via <code>dct:conformsTo</code> (W3C PROF + Content Negotiation by Profile); <code>semantic_profile</code> retained as a registered token alias; token↔URI registry at <code>profiles/registry.json</code>. <strong>Hash preimage unchanged.</strong></span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">§8 + §11</span>
+        <span class="change-desc">Added the <code>iso20022:party-identification</code> profile (REDA/ACMT-aligned PartyIdentification subset: <code>party_name</code> + <code>lei</code>) for party-only payloads, so non-payment nodes can declare conformance truthfully instead of being force-tagged with a payment profile.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">Graph Index</span>
+        <span class="change-desc">Fixed DCAT-mirror drift in <code>chaingraph.json</code> (<code>ocg</code> namespace and <code>ocg:spec_version</code> advanced from 0.2 to 0.3.1); added dataset-level <code>dct:conformsTo</code> on profiled nodes.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">Envelope</span>
+        <span class="change-desc">Harmonized the artifact envelope on <code>chaingraph_version</code> as the single version anchor (Standard §1). The legacy tool-export field <code>ap2_version</code> (value <code>"1.0.0"</code>) is a <strong>deprecated alias</strong> — it is NOT the AP2 standard version (Agent Payments Protocol is at v0.2) — retained for back-compat and slated for removal in v0.4. Genuine AP2 conformance is now declared explicitly via <code>dct:conformsTo</code> → the AP2 v0.2 spec on the tools that validate AP2 structures (ART-01, ART-15/16/17, ART-30, the AP2 payments checker), not via a blanket version field.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">Domain</span>
+        <span class="change-desc">Canonical URLs repointed from the non-resolving <code>openchain.graph</code> to the live <code>ainumbers.co/chaingraph</code> base (Option B). Profile URIs use the <code>.jsonld</code> extension so they dereference on static hosting.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">Guides</span>
+        <span class="change-desc">Added <code>guide-profiles.html</code> (now eight integration guides).</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">Compat</span>
+        <span class="change-desc">All v0.1/v0.2/v0.3 artifacts remain valid. Every v0.3.1 field is optional. <code>ap2_version</code> still accepted (deprecated). Internal <code>chaingraph_version</code> and folder paths unchanged.</span>
+      </div>
+    </div>
+
+    <h3 style="margin-top:1.6rem">v0.2 → v0.3</h3>
+    <div style="margin-top:.6rem">
+      <div class="change-row">
+        <span class="change-ref">§8</span>
+        <span class="change-desc">Added the optional <strong>ISO 20022 semantic profile</strong> — a published JSON-LD overlay (<code>iso20022-context.jsonld</code>) mapping amount/party/agent payload fields to ISO 20022 business elements, with external code lists (ISO 4217/3166/9362/13616/17442) adopted by reference. Minimal, optional, additive. <strong>Hash preimage unchanged.</strong></span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">§9</span>
+        <span class="change-desc">Formalized optional party identity: <code>did:key</code> as the recommended <code>keyid</code> form, and ISO 17442 <strong>LEI</strong> on publisher/tool identity, optionally bound to the Ed25519 signing key.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">§7 + §8</span>
+        <span class="change-desc">Added the optional <code>ocg:semantic_profile</code> marker on Graph Index nodes so crawlers and agents can discover ISO 20022-aligned tools.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">§10</span>
+        <span class="change-desc">Published an <strong>OKF companion bundle</strong> auto-generated from <code>chaingraph.json</code> — the narrative knowledge layer beside the DCAT catalog. OKF concepts are knowledge, never decision artifacts.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">Guides</span>
+        <span class="change-desc">Added <code>guide-iso20022.html</code> and <code>guide-okf.html</code> to the integration-guide series (now seven: PROV-DM, buildType, in-toto, Ed25519, OTel, ISO 20022, OKF).</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">§4</span>
+        <span class="change-desc"><code>buildType</code> is unchanged — the <code>WebCryptoSHA256</code> URI is a version-independent identifier of the hash construction, which is byte-identical in v0.3. v0.3 artifacts retain <code>https://ainumbers.co/chaingraph/context/v0.2#WebCryptoSHA256</code>; only <code>@context</code> and <code>chaingraph_version</code> advance to v0.3 (minting a new buildType URI is reserved for an actual algorithm change).</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">Compat</span>
+        <span class="change-desc">All v0.1 and v0.2 artifacts remain valid. Every v0.3 field is optional. Internal <code>chaingraph_version</code> and folder paths are unchanged.</span>
+      </div>
+    </div>
+
+    <h3 style="margin-top:1.6rem">v0.1 → v0.2</h3>
+    <div style="margin-top:1rem">
+      <div class="change-row">
+        <span class="change-ref">§1 + §3</span>
+        <span class="change-desc">Added optional <code>"@context"</code> field pointing to the published JSON-LD context. Artifacts without this field remain valid (backwards compatible).</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">§1 + §4</span>
+        <span class="change-desc">Added optional <code>"buildType"</code> URI identifying the hash construction algorithm. Default value defined for WebCrypto SHA-256.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">§4</span>
+        <span class="change-desc">Upgraded <code>audit_signature</code> from an opaque field to an in-toto Attestation Framework (ITE-6) envelope with <code>payloadType</code>, <code>payload</code>, and <code>signatures</code> array. Bare-string values from v0.1 are still accepted by verifiers.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">§5</span>
+        <span class="change-desc">Specified Ed25519 (RFC 8032) as the signing algorithm. Optional — vendors that do not sign may omit <code>audit_signature.signatures</code>.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">§6</span>
+        <span class="change-desc">Published OpenTelemetry span mapping. Enables decision chains to appear in existing APM stacks (Datadog, Grafana Tempo, Jaeger) without new infrastructure.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">§7</span>
+        <span class="change-desc">Upgraded Graph Index format to DCAT 3.0 catalog. Added <code>ocg:signing_keys</code> per tool for Ed25519 key lookup. Added <code>dcat:accessService</code> per tool pointing to the MCP endpoint.</span>
+      </div>
+      <div class="change-row">
+        <span class="change-ref">Brand</span>
+        <span class="change-desc">Renamed from ChainGraph to OpenChainGraph in all public-facing text. Internal protocol identifiers (<code>chaingraph_version</code>, <code>x-chaingraph</code>, folder paths) remain unchanged.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p class="foot">
+      OpenChainGraph Standard v0.4.0 · Editor: <a href="https://postoaklabs.com">Post Oak Labs</a> · 2026
+      <span>·</span>
+      Reference implementation: <a href="https://ainumbers.co">AINumbers.co</a>
+      <span>·</span>
+      <a href="openchain-graph-explainer.html">Interactive Explainer →</a>
+      <span>·</span>
+      Licensed CC BY 4.0
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -86,7 +86,7 @@ async function executionHash(policy_parameters, output_payload) {
 
 To make an existing decision-tool suite conformant (§11):
 
-1. **L1** — wrap outputs in the envelope and compute the execution hash. Usually a serialization change, not a logic change. Pick your `mandate_namespace` (e.g. `io.apexlogics`, `ocs`).
+1. **L1** — wrap outputs in the envelope and compute the execution hash. Usually a serialization change, not a logic change. Pick your `mandate_namespace` (e.g. `org.apexlogics`, `me.omegacentauri`).
 2. **L2** — add the `chain` block: copy each consumed artifact's `execution_hash` into `parent_hashes`.
 3. **L3** — expose `tools/call` + `verify_execution_hash` (+ `emit_<vendor>_artifact`, `build_chaingraph`).
 4. **L4** — publish a graph index and an A2A agent card declaring the `x-chaingraph` extension; link both from `llms.txt`.
