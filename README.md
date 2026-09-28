@@ -2,11 +2,13 @@
 
 **An open, vendor-neutral specification for verifiable, chainable, agent-callable decision artifacts.**
 
-[![Spec](https://img.shields.io/badge/spec-v0.4-14B8A6)](https://postoaklabs.github.io/chaingraph/) [![License](https://img.shields.io/badge/license-CC%20BY%204.0-D4A847)](https://creativecommons.org/licenses/by/4.0/)
+[![Spec](https://img.shields.io/badge/artifact%20format-v0.4-14B8A6)](https://postoaklabs.github.io/chaingraph/) [![License](https://img.shields.io/badge/license-CC%20BY%204.0-D4A847)](https://creativecommons.org/licenses/by/4.0/)
 
-> The badge and prose below track `spec.html`'s patch-agnostic **v0.4** label; `SPEC.md`'s frontmatter `spec_version` carries the exact current patch. Don't hand-type a patch version here — it drifts as fast as any other count.
+> **Two version axes, don't conflate them.** The artifact *format* and schema are pinned at **v0.4** (`chaingraph_version` 0.4.x; the execution-hash preimage is frozen, so artifacts keep verifying forever). The specification *document* evolves additively around that frozen format: `SPEC.md` frontmatter `spec_version` carries the exact current version. The badge tracks the format axis because it is the stable one; never hand-type a spec patch version here — it drifts as fast as any other count.
 
 > A decision tool returns a **verdict, score, or verified mandate** — not reference data. ChainGraph defines a small, transport-neutral envelope for that output: it carries a **reproducible execution hash**, may cite the hashes of the artifacts it consumed (a verifiable provenance DAG), and is exposed to AI agents over standard protocols (MCP, A2A). One common receipt format, so decision tools from different vendors can be chained, audited, and independently verified by any agent.
+
+> Naming: **OpenChainGraph** is the standard's formal name (see `SPEC.md`); **ChainGraph** is the short name its surfaces and this mirror use.
 
 **ChainGraph is not** a payments protocol, an identity protocol, or an inference framework. It is the connective envelope and provenance model beneath them — deliberately compatible with AP2, ACP, x402, A2A, KYA-OS, and MCP without replacing any of them.
 
@@ -16,7 +18,7 @@
 
 ## At a glance
 
-**The four conformance levels** (§3) — each includes the lower ones:
+**The four adoption levels** — each includes the lower ones. This ladder is adoption guidance defined here in this README (the artifact field `ocg:conformance_level` records where a suite sits):
 
 | Level | Name | Requirement |
 |---|---|---|
@@ -25,7 +27,7 @@
 | **L3** | Agent-callable | Exposes the tool over MCP `tools/call` and/or an A2A skill, returning the artifact as structured content. |
 | **L4** | Discoverable | Publishes a graph index of tools + chain edges, linked from a discovery surface. |
 
-**The Five Tests** (§4) — a tool is conformant iff it passes all five: (1) emits a valid envelope, (2) exposes a typed agent endpoint, (3) exports a decision not context, (4) is chainable, (5) carries a verifiable hash anchor.
+**How the spec grades conformance.** The spec's normative conformance surface is the **§15 gate suite** (conformance-by-construction: gates run over artifacts, so a conformant artifact is one the gates pass). Separately, the **strength-of-verifiable ladder (§18.4)** grades how strongly an artifact is verifiable: L1 execution hash (tamper-evidence) → L2 §16 signature proof (authenticated attestation) → L3 §18 zk compute receipt (succinct compute-integrity). Note the two ladders use L-numbers with different meanings; this README keeps the adoption ladder's numbering because artifacts already carry it.
 
 **The execution hash** — `sha256:` + SHA-256 over the RFC 8785 (JCS) canonical JSON of `{policy_parameters, output_payload}`. Any party recomputes it to verify an artifact — no trusted signer. Tools MUST be deterministic (seed RNG from `policy_parameters`). See `SPEC.md` §4 for the normative preimage rule — a plain recursive-key-sort canonicalizer is a close cousin of JCS but not identical on edge cases (number formatting, escaping); implementations MUST use a real RFC 8785 canonicalizer, not hand-roll one.
 
@@ -39,7 +41,8 @@ chaingraph/
 ├── SPEC.md                                 # Normative spec, MARKDOWN SOURCE (synced — see below)
 ├── spec.html                               # Normative spec, RENDERED (synced — see below)
 ├── schema/
-│   └── openchain-graph-v0.4.schema.json    # JSON Schema for the artifact envelope (synced)
+│   ├── openchain-graph-v0.4.schema.json    # JSON Schema for the artifact envelope (synced)
+│   └── chaingraph-v0.1.json                # Legacy v0.1 envelope schema (superseded, kept for history)
 ├── ext/
 │   └── x-chaingraph/v0.1.json              # A2A capability-extension descriptor (mirror-owned)
 ├── profiles/                               # Compute Binding / Export Profile docs (mirror-owned)
@@ -101,7 +104,7 @@ in the reference implementation repo.
 
 ## Adopting ChainGraph in your own suite
 
-To make an existing decision-tool suite conformant (§11):
+To make an existing decision-tool suite conformant, walk the adoption levels:
 
 1. **L1** — wrap outputs in the envelope and compute the execution hash. Usually a serialization change, not a logic change. Pick your `mandate_namespace` (e.g. `org.apexlogics`, `me.omegacentauri`).
 2. **L2** — add the `chain` block: copy each consumed artifact's `execution_hash` into `parent_hashes`.
